@@ -7,7 +7,7 @@
       "passwordSalt": "fb279b659cfaf741220a046edab84cb4",
       "walletAddress": "0x577a71aeae2c21d56b0c99d1e7c568fcc2391587",
       "created": "2025-03-23T06:50:10.778Z",
-      "lastLogin": "2025-03-23T16:16:34.938Z",
+      "lastLogin": "2025-03-31T12:58:20.484Z",
       "role": "voter"
     },
     {
@@ -17,8 +17,28 @@
       "passwordSalt": "c9d72351ffb4df3635573958ab54431e",
       "walletAddress": "0x0b26432e4c0a4db3bcea7feff8e11f66468731f5",
       "created": "2025-03-23T06:53:40.946Z",
-      "lastLogin": "2025-03-27T00:03:09.212Z",
+      "lastLogin": "2025-03-31T12:19:12.256Z",
       "role": "admin"
+    },
+    {
+      "id": "f7e0de77-2210-4fe3-b2b1-478ba171c984",
+      "nationalId": "20034119",
+      "passwordHash": "f12f5a1b2e2b53ace6c10d389f89f3aee24ae5aba041c0b96d56dc15dc7a5051c0ec227a6cc0d4ad2dd2c60099e4ffc35ee5fc30d8987ba1a6223d4e8b7ec077",
+      "passwordSalt": "d7891499edb3d18f1d88f6f9c2e0a8c4",
+      "walletAddress": "0x8305528547df8924615ef072cc2b05d9417d494b",
+      "created": "2025-03-27T11:15:41.994Z",
+      "lastLogin": "2025-03-31T11:49:09.487Z",
+      "role": "voter"
+    },
+    {
+      "id": "9b5ca020-8266-454d-9eb8-bd14640f8266",
+      "nationalId": "41411738",
+      "passwordHash": "a3af5ad45eab0425608581d40308688886b99720354a3fcf2657782c109b4f012d82aa650cbba462381ecfad03fb52594587ebb0765105b7d1cae5026298e3d6",
+      "passwordSalt": "d8ed39c316446a3854a44831d02032df",
+      "walletAddress": "0x16167d10b59ae707bb7a8db7072b878eaca89672",
+      "created": "2025-03-31T12:41:30.663Z",
+      "lastLogin": "2025-03-31T12:41:53.628Z",
+      "role": "voter"
     }
   ]
 }

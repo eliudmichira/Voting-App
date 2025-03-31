@@ -1690,13 +1690,13 @@
                         await loadCandidates();
                         showFeedback("Connected to blockchain successfully", "Connection Established", false);
                     } else {
-                        throw new Error("Blockchain connection failed. Switching to demo mode.");
+                        throw new Error("Blockchain connection failed. Please ensure MetaMask is installed and connected.");
                     }
                 } catch (error) {
                     debugLog("Connection Error", error);
                     showFeedback(error.message, "Connection Failed", true);
                     
-                    // Load demo mode as fallback
+                    // // Disable functionality when blockchain connection fails
                     await loadVotingDates();
                     await loadCandidates();
                     showFeedback("Using demo mode due to connection failure.", "Demo Mode", true);

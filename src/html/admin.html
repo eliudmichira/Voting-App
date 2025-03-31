@@ -79,7 +79,7 @@
         .icon-delete::before { content: "🗑️"; }
         .icon-save::before { content: "💾"; }
         .icon-refresh::before { content: "🔄"; }
-        .icon-wallet::before { content: "👛"; }
+        .icon-wallet::before { content: "💰"; }
         .icon-connect::before { content: "🔌"; }
         .icon-vote::before { content: "🗳️"; }
         .icon-disconnect::before { content: "🔌"; }
@@ -321,6 +321,11 @@
                         <button id="connectButton" class="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm">
                             <span class="icon-connect mr-2"></span><span>Connect</span>
                         </button>
+                        
+                        <!-- Logout Button -->
+                        <button id="logoutButton" class="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm">
+                            <span class="icon-logout mr-2"></span><span>Logout</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -328,32 +333,6 @@
 
         <!-- Main Content -->
         <main class="container mx-auto px-4 py-8">
-            <!-- Tabs -->
-            <div class="mb-8">
-                <ul class="flex flex-wrap text-sm font-medium text-center border-b border-gray-200 dark:border-gray-700">
-                    <li class="mr-2">
-                        <a href="#" class="tab-link active inline-block p-4 rounded-t-lg" data-tab="voting">
-                            <span class="icon-vote mr-2"></span>Voting Management
-                        </a>
-                    </li>
-                    <li class="mr-2">
-                        <a href="#" class="tab-link inline-block p-4 rounded-t-lg" data-tab="candidates">
-                            <span class="icon-user mr-2"></span>Candidates
-                        </a>
-                    </li>
-                    <li class="mr-2">
-                        <a href="#" class="tab-link inline-block p-4 rounded-t-lg" data-tab="results">
-                            <span class="icon-chart mr-2"></span>Results
-                        </a>
-                    </li>
-                    <li class="mr-2">
-                        <a href="#" class="tab-link inline-block p-4 rounded-t-lg" data-tab="settings">
-                            <span class="icon-settings mr-2"></span>Settings
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
             <!-- Connection Status Card -->
             <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                 <div class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
@@ -512,13 +491,24 @@
                                             placeholder="Enter political party" autocomplete="organization">
                                     </div>
                                     <div>
-                                        <label for="imageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Image URL (Optional)
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Candidate Image
                                         </label>
-                                        <input type="text" id="imageUrl" name="imageUrl"
-                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                            placeholder="Enter image URL" autocomplete="url">
-                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank to use default avatar image</p>
+                                        <div id="imageDropArea" class="mt-1 relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center hover:border-primary-500 dark:hover:border-primary-500 transition-colors cursor-pointer">
+                                            <div id="imagePreviewContainer" class="hidden mb-3 relative">
+                                                <img id="imagePreview" class="h-24 w-24 object-cover rounded-lg shadow-sm" src="" alt="Candidate preview">
+                                                <button type="button" id="removeImageBtn" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors">
+                                                    ✕
+                                                </button>
+                                            </div>
+                                            <div id="uploadIconContainer">
+                                                <span class="mb-2 block text-3xl text-gray-400 dark:text-gray-500">📷</span>
+                                                <span class="text-gray-600 dark:text-gray-400">Drag image here or click to upload</span>
+                                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">PNG, JPG, or JPEG up to 2MB</p>
+                                            </div>
+                                            <input type="file" id="imageUpload" name="imageUpload" accept="image/png, image/jpeg, image/jpg" class="sr-only">
+                                            <input type="hidden" id="imageUrl" name="imageUrl">
+                                        </div>
                                     </div>
                                     <div class="pt-2">
                                         <button type="submit" id="addCandidateButton"
@@ -1598,6 +1588,13 @@
         function disconnectWallet() {
             debugLog('Disconnecting wallet...');
             
+            // Show loading state on logout button
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.disabled = true;
+                logoutButton.innerHTML = '<div class="loader"></div><span>Logging out...</span>';
+            }
+            
             // Reset global variables
             accounts = [];
             isAdmin = false;
@@ -1607,8 +1604,17 @@
             // Update UI
             updateUIConnectionStatus(false);
             
-            // Clear local storage
+            // Clear all authentication related data from localStorage
             localStorage.removeItem('walletConnected');
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_role');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('national_id');
+            localStorage.removeItem('wallet_address');
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('voterId');
+            localStorage.removeItem('isAuthenticated');
             
             // Reset UI elements to loading/default state
             document.getElementById('candidateList').innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center">Connect your wallet to view candidates</td></tr>';
@@ -1622,7 +1628,12 @@
             document.getElementById('candidateFeedbackContainer').classList.add('hidden');
             document.getElementById('datesFeedbackContainer').classList.add('hidden');
             
-            debugLog('Wallet disconnected');
+            debugLog('Wallet disconnected and user logged out');
+            
+            // Redirect to login page after a short delay
+            setTimeout(() => {
+                window.location.href = "login.html?logout=success&t=" + new Date().getTime();
+            }, 500);
         }
         
         // Check if connected account is the contract admin
@@ -2639,13 +2650,24 @@
                             placeholder="Enter political party" autocomplete="organization">
                     </div>
                     <div>
-                        <label for="editImageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Image URL (Optional)
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Candidate Image
                         </label>
-                        <input type="text" id="editImageUrl" name="editImageUrl"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            placeholder="Enter image URL" autocomplete="url">
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank to use default avatar image</p>
+                        <div id="editImageDropArea" class="mt-1 relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center hover:border-primary-500 dark:hover:border-primary-500 transition-colors cursor-pointer">
+                            <div id="editImagePreviewContainer" class="hidden mb-3 relative">
+                                <img id="editImagePreview" class="h-24 w-24 object-cover rounded-lg shadow-sm" src="" alt="Candidate preview">
+                                <button type="button" id="editRemoveImageBtn" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors">
+                                    ✕
+                                </button>
+                            </div>
+                            <div id="editUploadIconContainer">
+                                <span class="mb-2 block text-3xl text-gray-400 dark:text-gray-500">📷</span>
+                                <span class="text-gray-600 dark:text-gray-400">Drag image here or click to upload</span>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">PNG, JPG, or JPEG up to 2MB</p>
+                            </div>
+                            <input type="file" id="editImageUpload" name="editImageUpload" accept="image/png, image/jpeg, image/jpg" class="sr-only">
+                            <input type="hidden" id="editImageUrl" name="editImageUrl">
+                        </div>
                     </div>
                     <div class="pt-2">
                         <button type="submit" id="updateCandidateButton"
@@ -2666,6 +2688,19 @@
             document.getElementById('editName').value = name;
             document.getElementById('editParty').value = party;
             document.getElementById('editImageUrl').value = imageUrl === appConfig.defaultImageUrl ? '' : imageUrl;
+            
+            // Update image preview if available
+            if (imageUrl && imageUrl !== appConfig.defaultImageUrl) {
+                const previewImg = document.getElementById('editImagePreview');
+                const previewContainer = document.getElementById('editImagePreviewContainer');
+                const uploadIconContainer = document.getElementById('editUploadIconContainer');
+                
+                if (previewImg && previewContainer && uploadIconContainer) {
+                    previewImg.src = imageUrl;
+                    previewContainer.classList.remove('hidden');
+                    uploadIconContainer.classList.add('hidden');
+                }
+            }
             
             // Clear any previous feedback
             document.getElementById('editCandidateFeedbackContainer').classList.add('hidden');
@@ -2755,6 +2790,130 @@
             
             feedback.textContent = message;
             feedbackContainer.classList.remove('hidden');
+        }
+    </script>
+
+    <!-- Image Upload Scripts -->
+    <script>
+        // Initialize the drag and drop functionality for image uploads
+        document.addEventListener('DOMContentLoaded', function() {
+            initImageUpload('imageDropArea', 'imageUpload', 'imagePreview', 'imagePreviewContainer', 'uploadIconContainer', 'removeImageBtn', 'imageUrl');
+            
+            // Also initialize for the edit modal with different IDs
+            initImageUpload('editImageDropArea', 'editImageUpload', 'editImagePreview', 'editImagePreviewContainer', 'editUploadIconContainer', 'editRemoveImageBtn', 'editImageUrl');
+        });
+        
+        function initImageUpload(dropAreaId, fileInputId, previewImgId, previewContainerId, uploadIconContainerId, removeBtnId, hiddenInputId) {
+            const dropArea = document.getElementById(dropAreaId);
+            const fileInput = document.getElementById(fileInputId);
+            const previewImg = document.getElementById(previewImgId);
+            const previewContainer = document.getElementById(previewContainerId);
+            const uploadIconContainer = document.getElementById(uploadIconContainerId);
+            const removeBtn = document.getElementById(removeBtnId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+            
+            if (!dropArea || !fileInput || !previewImg || !previewContainer || !uploadIconContainer || !removeBtn || !hiddenInput) {
+                return; // Skip initialization if any element is missing
+            }
+            
+            // Handle click on drop area
+            dropArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Handle file selection
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // Handle drag and drop events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            // Handle remove button click
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent triggering dropArea click
+                removeImage();
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function highlight() {
+                dropArea.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
+            }
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    handleFiles(files);
+                }
+            }
+            
+            function handleFileSelect(e) {
+                const files = e.target.files;
+                if (files.length) {
+                    handleFiles(files);
+                }
+            }
+            
+            function handleFiles(files) {
+                const file = files[0]; // We only handle one file
+                
+                // Validate file type and size
+                if (!file.type.match('image/jpeg') && !file.type.match('image/png') && !file.type.match('image/jpg')) {
+                    alert('Please upload a valid image file (PNG, JPG or JPEG)');
+                    return;
+                }
+                
+                if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                    alert('File size exceeds 2MB limit');
+                    return;
+                }
+                
+                // Convert to base64 and display preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Set preview image
+                    previewImg.src = e.target.result;
+                    
+                    // Store base64 in hidden input for form submission
+                    hiddenInput.value = e.target.result;
+                    
+                    // Show preview, hide upload icon
+                    previewContainer.classList.remove('hidden');
+                    uploadIconContainer.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            function removeImage() {
+                // Clear input and preview
+                fileInput.value = '';
+                hiddenInput.value = '';
+                previewImg.src = '';
+                
+                // Hide preview, show upload icon
+                previewContainer.classList.add('hidden');
+                uploadIconContainer.classList.remove('hidden');
+            }
         }
     </script>
 </body>
