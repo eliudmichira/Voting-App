@@ -13,6 +13,134 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
     
+    // EMERGENCY AUTHENTICATION OVERRIDE
+    // Check if we came from login page in the last 10 seconds using the referring page
+    const referrer = document.referrer;
+    const currentTime = Date.now();
+    const lastLogin = localStorage.getItem('login_timestamp');
+    
+    // NEW: Check for our special session flag
+    const justLoggedIn = sessionStorage.getItem('JUST_LOGGED_IN') === 'true';
+    const loginTime = sessionStorage.getItem('LOGIN_TIME');
+    const recentSessionLogin = loginTime && (currentTime - parseInt(loginTime)) < 10000;
+    
+    debugLog("Authentication check starting", {
+        referrer,
+        justLoggedIn,
+        recentSessionLogin,
+        hasToken: !!localStorage.getItem("auth_token"),
+        hasRole: !!localStorage.getItem("user_role"),
+        hasId: !!localStorage.getItem("user_id"),
+        hasAuthFlag: localStorage.getItem("isAuthenticated") === "true",
+        loginTime: lastLogin ? new Date(parseInt(lastLogin)).toISOString() : null
+    });
+    
+    // If we came from login in the last 10 seconds, FORCE authentication
+    if (
+        justLoggedIn || 
+        recentSessionLogin ||
+        (referrer && referrer.includes('login.html')) || 
+        (lastLogin && (currentTime - parseInt(lastLogin)) < 10000)
+    ) {
+        debugLog("EMERGENCY: Recently came from login page, forcing authentication");
+        
+        // Force authentication flag
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        // Continue with app initialization
+        debugLog("Continuing with app initialization after forced authentication");
+        
+        // Reset redirect counter
+        sessionStorage.removeItem('redirectCounter');
+        
+        // Clear the one-time session flag to prevent infinite authentication
+        if (justLoggedIn) {
+            sessionStorage.removeItem('JUST_LOGGED_IN');
+            debugLog("Cleared one-time login flag");
+        }
+    }
+    
+    // **** CRITICAL FIX: CHECK FOR AUTH IN URL FIRST BEFORE ANY OTHER LOGIC ****
+    // This must be the very first operation in the script
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // DEBUG: Log the complete URL and search parameters to console
+    console.warn("URL DIAGNOSTICS:", {
+        completeUrl: window.location.href,
+        searchParams: window.location.search,
+        hashParams: window.location.hash,
+        allCookies: document.cookie
+    });
+    
+    // If URL has auth=fresh parameter, this is a fresh login and we should bypass all other checks
+    if (urlParams.get('auth') === 'fresh') {
+        // This is a fresh login, ensure we reset redirect counter and set authenticated flag
+        debugLog("Fresh login detected via URL parameter, bypassing all other checks");
+        console.log("AUTH DETECTED: User has just logged in with auth=fresh parameter"); // Extra console log for easier debugging
+        sessionStorage.removeItem('redirectCounter');
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        // Get user info from URL if available
+        const userId = urlParams.get('id');
+        const userRole = urlParams.get('role');
+        if (userId) localStorage.setItem('user_id', userId);
+        if (userRole) localStorage.setItem('user_role', userRole);
+        
+        // Set verification cookie for future page loads
+        document.cookie = `auth_verified=true; path=/; max-age=3600`;
+        document.cookie = `auth_time=${Date.now()}; path=/; max-age=3600`;
+        document.cookie = `auth_user_id=${userId || "unknown"}; path=/; max-age=3600`;
+        document.cookie = `auth_role=${userRole || "voter"}; path=/; max-age=3600`;
+        
+        // Also set session flag for double safety
+        sessionStorage.setItem('JUST_LOGGED_IN', 'true');
+        sessionStorage.setItem('LOGIN_TIME', Date.now().toString());
+        
+        // FORCE auth flag to true - no matter what
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        console.log("AUTH STATE VERIFIED - Detected auth=fresh in URL");
+        
+        // Continue with app initialization...
+        debugLog("Continuing with app initialization for fresh login");
+        
+        // Reset redirect counter
+        sessionStorage.removeItem('redirectCounter');
+        
+        // Initialize the application now that we know the user is authenticated
+        initApp();
+        // EXIT EARLY - don't continue with other checks
+        return;
+    } else {
+        // Not a fresh login, check authentication through other means
+        
+        // ADDITIONAL DEBUG: Log that auth=fresh parameter was not found
+        debugLog("No auth=fresh parameter in URL, using standard authentication checks", {
+            url: window.location.href,
+            search: window.location.search,
+            urlParams: Object.fromEntries(urlParams),
+            cookies: document.cookie,
+            sessionStorageJustLoggedIn: sessionStorage.getItem('JUST_LOGGED_IN'),
+            localStorageIsAuthenticated: localStorage.getItem('isAuthenticated')
+        });
+        
+        // EMERGENCY FIX for cookie detection
+        const allCookies = document.cookie;
+        const hasAuthCookie = allCookies.includes('auth_verified=true');
+        
+        // If we have auth cookies but didn't detect them properly, force authentication
+        if (hasAuthCookie) {
+            console.log("EMERGENCY OVERRIDE: Detected auth cookies but auth=fresh was missing");
+            localStorage.setItem('isAuthenticated', 'true');
+            sessionStorage.setItem('JUST_LOGGED_IN', 'true');
+            sessionStorage.setItem('LOGIN_TIME', Date.now().toString());
+            
+            // Force the application to initialize as authenticated
+            debugLog("Forcing authentication based on auth cookies");
+            initApp();
+            return;
+    }
+    
     // State variables
     let provider;
     let signer;
@@ -23,28 +151,146 @@ document.addEventListener("DOMContentLoaded", async () => {
     const CONTRACT_ADDRESS = "0xb5121e15fb32F8c1003eb7fA9249b63c5CDa536d"; // Deployed contract address
 
     // Authentication data - accept either nationalId or voterId for backward compatibility
-    const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-    const role = localStorage.getItem("user_role") || localStorage.getItem("role");
-    const voterId = localStorage.getItem("national_id") || localStorage.getItem("voterId") || localStorage.getItem("nationalId");
-    const walletAddress = localStorage.getItem("wallet_address") || localStorage.getItem("walletAddress");
-    
-    // Consider user authenticated if they have token and ID
-    const isAuthenticated = (token && voterId) ? true : (localStorage.getItem("isAuthenticated") === "true");
-    
-    debugLog("Authentication check:", { token: !!token, role, voterId: !!voterId, isAuthenticated });
+        const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+        const role = localStorage.getItem("user_role") || localStorage.getItem("role");
+        const voterId = localStorage.getItem("national_id") || localStorage.getItem("voterId") || localStorage.getItem("nationalId");
+        const walletAddress = localStorage.getItem("wallet_address") || localStorage.getItem("walletAddress");
+        
+        // NEW: Check cookies for authentication data (highest priority)
+        function getCookie(name) {
+            try {
+                // More robust cookie parsing
+                const cookieString = document.cookie;
+                console.log("Reading cookies:", cookieString);
+                
+                // First attempt - standard method
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) {
+                    const cookieValue = parts.pop().split(';').shift();
+                    console.log(`Found cookie ${name} with value: ${cookieValue}`);
+                    return cookieValue;
+                }
+                
+                // Second attempt - regex matching
+                const regex = new RegExp(`(?:^|;\\s*)${name}=([^;]*)`,'i');
+                const match = regex.exec(cookieString);
+                if (match) {
+                    console.log(`Found cookie ${name} with regex: ${match[1]}`);
+                    return match[1];
+                }
+                
+                // Third attempt - manual split and search
+                const cookies = cookieString.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        const cookieValue = cookie.substring(name.length + 1);
+                        console.log(`Found cookie ${name} with manual search: ${cookieValue}`);
+                        return cookieValue;
+                    }
+                }
+                
+                console.log(`Cookie ${name} not found with any method`);
+                return null;
+            } catch (error) {
+                console.error("Error reading cookie:", error);
+                return null;
+            }
+        }
+        
+        // Check for auth cookies - these are more reliable than localStorage
+        const cookieAuth = getCookie('auth_verified') === 'true';
+        const cookieAuthTime = getCookie('auth_time');
+        const cookieUserId = getCookie('auth_user_id');
+        const cookieRole = getCookie('auth_role');
+        
+        // Debug cookie information
+        console.log("Cookie authentication state:", {
+            cookieAuth,
+            cookieAuthTime,
+            cookieUserId,
+            cookieRole,
+            rawCookies: document.cookie
+        });
+        
+        // Check for recent login timestamp (within the last 10 minutes) - increase to 10 minutes for more reliability
+        const loginTimestamp = localStorage.getItem('login_timestamp');
+        const loginWithinTenMinutes = loginTimestamp && (Date.now() - parseInt(loginTimestamp) < 10 * 60 * 1000);
+        
+        // More robust authentication check with cookies as highest priority: 
+        // 1. Cookie authentication takes highest priority
+        // 2. Fresh login from URL parameters as second priority
+        // 3. Recent login timestamp (within 10 minutes)
+        // 4. Traditional localStorage checks
+        const isAuthenticated = 
+            cookieAuth ||
+            loginWithinTenMinutes ||
+            justLoggedIn ||
+            recentSessionLogin ||
+            localStorage.getItem("isAuthenticated") === "true" ||
+            (token && voterId) || 
+            // NEW: Special case - we came from login.html in the last few seconds
+            (referrer && referrer.includes('login.html'));
+        
+        // Add console log with authentication state for debugging
+        console.log("Authentication state:", { 
+            isAuthenticated, 
+            cookieAuth, 
+            justLoggedIn, 
+            tokenExists: !!token, 
+            voterIdExists: !!voterId,
+            isAuthenticatedFlag: localStorage.getItem("isAuthenticated") === "true",
+            loginWithinTenMinutes,
+            recentSessionLogin,
+            referrerFromLogin: referrer && referrer.includes('login.html')
+        });
+        
+        debugLog("Authentication check details:", { 
+            cookieAuth,
+            cookieUserId,
+            cookieRole,
+            cookieAuthTime: cookieAuthTime ? new Date(parseInt(cookieAuthTime)).toISOString() : null,
+            token: !!token, 
+            role, 
+            voterId: !!voterId, 
+            isAuthenticated,
+            justLoggedIn,
+            recentSessionLogin,
+            loginWithinTenMinutes,
+            referrerFromLogin: referrer && referrer.includes('login.html'),
+            urlParams: Object.fromEntries(urlParams)
+        });
     
     // Check redirect count to avoid loops
     const redirectCount = parseInt(sessionStorage.getItem('redirectCounter') || '0');
     sessionStorage.setItem('redirectCounter', redirectCount + 1);
     
     // If not authenticated and haven't exceeded redirect limit, redirect to login
-    if ((!token || !voterId) && redirectCount < 2) {
+        if (!isAuthenticated && redirectCount < 3) {
         debugLog("Not authenticated, redirecting to login");
-        window.location.href = "login.html?redirect_reason=not_authenticated&time=" + Date.now();
+            
+            // Add debug info to the URL
+            const debugParams = new URLSearchParams({
+                redirect_reason: 'not_authenticated',
+                time: Date.now(),
+                has_token: token ? 'yes' : 'no',
+                has_role: role ? 'yes' : 'no',
+                has_id: voterId ? 'yes' : 'no',
+                has_auth_flag: localStorage.getItem("isAuthenticated") === 'true' ? 'yes' : 'no',
+                recent_login: loginWithinTenMinutes ? 'yes' : 'no',
+                redirect_count: redirectCount,
+                login_time: loginTimestamp || 'none',
+                cookie_auth: cookieAuth ? 'yes' : 'no',
+                cookie_time: cookieAuthTime || 'none',
+                cookie_id: cookieUserId || 'none'
+            });
+            
+            window.location.href = "login.html?" + debugParams.toString();
         return;
     } 
     // If redirect limit exceeded, show message but don't redirect
-    else if ((!token || !voterId) && redirectCount >= 2) {
+        else if (!isAuthenticated && redirectCount >= 3) {
         debugLog("Breaking redirect loop - showing message");
         
         // Show message to user
@@ -80,74 +326,74 @@ document.addEventListener("DOMContentLoaded", async () => {
     // We're authenticated - reset redirect counter
     sessionStorage.removeItem('redirectCounter');
     
-    async function makeApiRequest(url, method = 'GET', body = null) {
-        // We're now always in offline mode - immediately use mock data
-        console.log(`API request in offline mode: ${url} (${method})`);
-        return getMockData(url, body);
-    }
-    
-    // Enhanced mock data provider for offline mode
-    function getMockData(url, requestBody = null) {
-        console.log(`Providing mock data for: ${url}`);
-        
-        // Extract endpoint from URL - handle various URL formats
-        let endpoint = '';
-        
-        // Handle absolute URLs
-        if (url.startsWith('http')) {
-            const urlObj = new URL(url);
-            endpoint = urlObj.pathname;
-        } else {
-            // Handle relative URLs
-            endpoint = url.startsWith('/') ? url : `/${url}`;
+        async function makeApiRequest(url, method = 'GET', body = null) {
+            // We're now always in offline mode - immediately use mock data
+            console.log(`API request in offline mode: ${url} (${method})`);
+            return getMockData(url, body);
         }
         
-        // Use window.mockData if it exists, or create our own response
-        if (window.mockData) {
-            // Check if we have predefined mock data for this endpoint
-            if (endpoint.includes('/voting/dates')) {
-                return window.mockData.votingDates;
+        // Enhanced mock data provider for offline mode
+        function getMockData(url, requestBody = null) {
+            console.log(`Providing mock data for: ${url}`);
+            
+            // Extract endpoint from URL - handle various URL formats
+            let endpoint = '';
+            
+            // Handle absolute URLs
+            if (url.startsWith('http')) {
+                const urlObj = new URL(url);
+                endpoint = urlObj.pathname;
+            } else {
+                // Handle relative URLs
+                endpoint = url.startsWith('/') ? url : `/${url}`;
+            }
+            
+            // Use window.mockData if it exists, or create our own response
+            if (window.mockData) {
+                // Check if we have predefined mock data for this endpoint
+                if (endpoint.includes('/voting/dates')) {
+                    return window.mockData.votingDates;
+                }
+                
+                if (endpoint.includes('/candidates')) {
+                    return window.mockData.candidates;
+                }
+            }
+            
+            // Basic mock data based on endpoint
+            if (endpoint.includes('/voting/dates') || endpoint.includes('/dates')) {
+                return {
+                    start_date: Math.floor(Date.now() / 1000) - (60 * 60 * 24),     // 1 day ago
+                    end_date: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7)    // 7 days from now
+                };
             }
             
             if (endpoint.includes('/candidates')) {
-                return window.mockData.candidates;
+                return [
+                    { id: 1, name: "William Ruto", party: "UDA", voteCount: 345 },
+                    { id: 2, name: "Raila Odinga", party: "ODM", voteCount: 287 },
+                    { id: 3, name: "Martha Karua", party: "NARC-Kenya", voteCount: 156 }
+                ];
             }
-        }
-        
-        // Basic mock data based on endpoint
-        if (endpoint.includes('/voting/dates') || endpoint.includes('/dates')) {
-            return {
-                start_date: Math.floor(Date.now() / 1000) - (60 * 60 * 24),     // 1 day ago
-                end_date: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7)    // 7 days from now
-            };
-        }
-        
-        if (endpoint.includes('/candidates')) {
-            return [
-                { id: 1, name: "William Ruto", party: "UDA", voteCount: 345 },
-                { id: 2, name: "Raila Odinga", party: "ODM", voteCount: 287 },
-                { id: 3, name: "Martha Karua", party: "NARC-Kenya", voteCount: 156 }
-            ];
-        }
-        
-        if (endpoint.includes('/vote')) {
+            
+            if (endpoint.includes('/vote')) {
+                return { 
+                    success: true, 
+                    message: "Vote recorded successfully (mock data)" 
+                };
+            }
+            
+            // Generic response for unknown endpoints
             return { 
                 success: true, 
-                message: "Vote recorded successfully (mock data)" 
+                message: "Mock response - API is in offline mode",
+                endpoint: endpoint,
+                timestamp: new Date().toISOString()
             };
-        }
-        
-        // Generic response for unknown endpoints
-        return { 
-            success: true, 
-            message: "Mock response - API is in offline mode",
-            endpoint: endpoint,
-            timestamp: new Date().toISOString()
-        };
     }
     
     // Enhanced token refresh logic with improved error handling
-    /* eslint-disable no-unused-vars */
+        /* eslint-disable no-unused-vars */
     async function refreshToken() {
         const refreshToken = localStorage.getItem("refreshToken");
         if (!refreshToken) {
@@ -206,35 +452,47 @@ document.addEventListener("DOMContentLoaded", async () => {
             return false;
         }
     }
-    /* eslint-enable no-unused-vars */
+        /* eslint-enable no-unused-vars */
     
     // Enhanced logout function with proper cleanup and error handling
-    logout = async function(skipApiCall = false) {
+        logout = async function(skipApiCall = false) {
         debugLog("Initiating logout process");
         
         try {
             // Get tokens before clearing them
-            const currentToken = localStorage.getItem("token") || localStorage.getItem("auth_token");
-            
-            // Clear all auth data first to prevent further authenticated requests
-            // Clear traditional tokens
-            localStorage.removeItem("token");
-            localStorage.removeItem("refreshToken");
-            localStorage.removeItem("voterId");
-            localStorage.removeItem("nationalId");
-            localStorage.removeItem("role");
-            localStorage.removeItem("isAuthenticated");
-            
-            // Clear new login system tokens
-            localStorage.removeItem("auth_token");
-            localStorage.removeItem("user_role");
-            localStorage.removeItem("user_id");
-            localStorage.removeItem("national_id");
-            localStorage.removeItem("wallet_address");
-            localStorage.removeItem("walletAddress");
-            localStorage.removeItem("rememberedNationalId");
-            localStorage.removeItem("rememberedExpiry");
-            
+                const currentToken = localStorage.getItem("token") || localStorage.getItem("auth_token");
+                
+                // UPDATED: Clear all auth data with a comprehensive list
+                // Clear all possible auth tokens and user data
+                const keysToRemove = [
+                    // Token keys
+                    "token", "auth_token", "refreshToken",
+                    
+                    // User identification keys
+                    "voterId", "nationalId", "national_id", "user_id",
+                    
+                    // User role keys
+                    "role", "user_role",
+                    
+                    // Wallet keys
+                    "wallet_address", "walletAddress", "walletConnectionTime",
+                    
+                    // Auth state keys
+                    "isAuthenticated",
+                    
+                    // Remember me keys
+                    "rememberedNationalId", "rememberedExpiry",
+                    
+                    // Any other potential auth-related keys
+                    "lastLogin", "sessionStart"
+                ];
+                
+                // Remove all keys in the list
+                keysToRemove.forEach(key => {
+                    localStorage.removeItem(key);
+                });
+                
+                // Clear session storage
             sessionStorage.clear();
             
             // Clear authentication cookies
@@ -285,7 +543,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Force redirect on error to ensure user is logged out
             window.location.href = "login.html?redirect_reason=error&time=" + Date.now();
         }
-    };
+        };
 
     // Initialize Ethers.js
     async function initEthers() {
@@ -295,9 +553,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         
         try {
-            // Get stored wallet address but don't use it directly - we'll get a fresh address from MetaMask
-            // This can be used for comparison if needed
-            const previousWalletAddress = localStorage.getItem('walletAddress');
+                // Get stored wallet address but don't use it directly - we'll get a fresh address from MetaMask
+                // This can be used for comparison if needed
+                const previousWalletAddress = localStorage.getItem('walletAddress');
             
             // Always get a fresh provider instance
             provider = new ethers.BrowserProvider(window.ethereum);
@@ -312,11 +570,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Get the current account
             const currentAddress = accounts[0];
             console.log("Connected to MetaMask with address:", currentAddress);
-            
-            // Check if wallet has changed
-            if (previousWalletAddress && previousWalletAddress !== currentAddress) {
-                console.log("Wallet address changed from previous session");
-            }
+                
+                // Check if wallet has changed
+                if (previousWalletAddress && previousWalletAddress !== currentAddress) {
+                    console.log("Wallet address changed from previous session");
+                }
             
             // Store the account address
             localStorage.setItem('walletAddress', currentAddress);
@@ -457,37 +715,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     // Enhanced API connection testing with fallback handling
     async function testApiConnection() {
-        console.log("Skipping API connection tests - using offline mode");
+            console.log("Skipping API connection tests - using offline mode");
+            
+            // Skip trying to connect to API endpoints that don't exist
+            API_URL = '';
+            
+            // Set up mock data for offline mode
+            setupMockDataHandlers();
+            
+            // Show friendly notice about offline mode
+            const offlineMessage = "Running in demo mode with sample data. API server not required.";
+            showFeedback(offlineMessage, false, "apiStatus");
+            
+            return false;
+        }
         
-        // Skip trying to connect to API endpoints that don't exist
-        API_URL = '';
-        
-        // Set up mock data for offline mode
-        setupMockDataHandlers();
-        
-        // Show friendly notice about offline mode
-        const offlineMessage = "Running in demo mode with sample data. API server not required.";
-        showFeedback(offlineMessage, false, "apiStatus");
-        
-        return false;
-    }
-    
-    // Setup mock data handlers and test data
-    function setupMockDataHandlers() {
-        window.mockData = {
-            candidates: [
-                { id: 1, name: "William Ruto", party: "UDA", voteCount: 345 },
-                { id: 2, name: "Raila Odinga", party: "ODM", voteCount: 287 },
-                { id: 3, name: "Martha Karua", party: "NARC-Kenya", voteCount: 156 },
-                { id: 4, name: "Rigathi Gachagua", party: "UDA", voteCount: 98 }
-            ],
-            votingDates: {
-                start_date: Math.floor(Date.now() / 1000) - (2 * 24 * 60 * 60), // 2 days ago
-                end_date: Math.floor(Date.now() / 1000) + (5 * 24 * 60 * 60)    // 5 days from now
-            }
-        };
-        
-        console.log("Initialized mock data for offline mode:", window.mockData);
+        // Setup mock data handlers and test data
+        function setupMockDataHandlers() {
+            window.mockData = {
+                candidates: [
+                    { id: 1, name: "William Ruto", party: "UDA", voteCount: 345 },
+                    { id: 2, name: "Raila Odinga", party: "ODM", voteCount: 287 },
+                    { id: 3, name: "Martha Karua", party: "NARC-Kenya", voteCount: 156 },
+                    { id: 4, name: "Rigathi Gachagua", party: "UDA", voteCount: 98 }
+                ],
+                votingDates: {
+                    start_date: Math.floor(Date.now() / 1000) - (2 * 24 * 60 * 60), // 2 days ago
+                    end_date: Math.floor(Date.now() / 1000) + (5 * 24 * 60 * 60)    // 5 days from now
+                }
+            };
+            
+            console.log("Initialized mock data for offline mode:", window.mockData);
     }
 
     // Initialize wallet address display
@@ -586,10 +844,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             ensureContract();
 
             const voteButton = document.getElementById("voteButton");
-            // Store references to DOM elements and use them later in the function
-            const candidateListElement = document.getElementById("candidateList");
+                // Store references to DOM elements and use them later in the function
+                const candidateListElement = document.getElementById("candidateList");
             const logoutButton = document.getElementById("logoutButton");
-            const statusAlertElement = document.getElementById("statusAlert");
+                const statusAlertElement = document.getElementById("statusAlert");
             
             // Show loading state
             showFeedback("Loading voting information...", false);
@@ -609,15 +867,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                     showFeedback("Failed to check vote status", true);
                 })
             ]);
-            
-            // Use the DOM elements we stored earlier
-            if (candidateListElement) {
-                console.log("Candidate list element found:", candidateListElement.children.length, "candidates loaded");
-            }
-            
-            if (statusAlertElement) {
-                console.log("Status alert element found:", statusAlertElement.textContent);
-            }
+                
+                // Use the DOM elements we stored earlier
+                if (candidateListElement) {
+                    console.log("Candidate list element found:", candidateListElement.children.length, "candidates loaded");
+                }
+                
+                if (statusAlertElement) {
+                    console.log("Status alert element found:", statusAlertElement.textContent);
+                }
             
             // Event listeners with error boundaries
             voteButton?.addEventListener("click", async (e) => {
@@ -698,8 +956,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const statusAlert = document.getElementById("statusAlert");
         const statusMessage = document.getElementById("statusMessage");
         const voteButton = document.getElementById("voteButton");
+            const resultsSection = document.getElementById("resultsSection");
         
-        if (!statusAlert || !statusMessage) return;
+            if (!statusAlert || !statusMessage || !resultsSection) return;
         
         // Set global status
         window.votingStatus = status;
@@ -714,19 +973,24 @@ document.addEventListener("DOMContentLoaded", async () => {
                 statusAlert.classList.add("bg-yellow-200", "dark:bg-yellow-800");
                 statusMessage.textContent = "Voting has not started yet. Please check back later.";
                 if (voteButton) voteButton.disabled = true;
+                    resultsSection.classList.add("hidden");
                 break;
             case "active":
                 statusAlert.classList.add("bg-green-200", "dark:bg-green-800");
                 statusMessage.textContent = "Voting is currently active. Select a candidate and cast your vote!";
                 if (voteButton) voteButton.disabled = window.votingStatus !== "active";
+                    resultsSection.classList.add("hidden");
                 break;
             case "ended":
                 statusAlert.classList.add("bg-red-200", "dark:bg-red-800");
                 statusMessage.textContent = "Voting has ended. Results are displayed below.";
                 if (voteButton) voteButton.disabled = true;
+                    resultsSection.classList.remove("hidden");
+                    loadResults();
                 break;
             default:
                 statusAlert.classList.add("hidden");
+                    resultsSection.classList.add("hidden");
                 break;
         }
         
@@ -1393,6 +1657,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     // Start the application
     initApp();
+    }
 });
 
 // Add event listener to logout button

@@ -399,4 +399,36 @@ input:checked + .toggle-slider:before {
   100% {
     box-shadow: 0 0 0 0 rgba(246, 133, 27, 0);
   }
+}
+
+/* Theme toggle button styles */
+#themeToggle {
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+#themeToggle:hover {
+  transform: scale(1.05);
+}
+
+#themeToggle.clicking {
+  animation: theme-toggle-click 0.3s ease;
+}
+
+/* Sun icon specific styles */
+.icon-sun {
+  color: #f59e0b; /* Amber-500 */
+  filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.5));
+}
+
+/* Moon icon specific styles */
+.icon-moon {
+  color: #93c5fd; /* Blue-300 */
+  filter: drop-shadow(0 0 2px rgba(147, 197, 253, 0.5));
+}
+
+/* Animation for theme toggle button click */
+@keyframes theme-toggle-click {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.9); }
+  100% { transform: scale(1); }
 } 

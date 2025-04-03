@@ -26,12 +26,27 @@
       }
     },
     "web": {
-      "favicon": "./public/favicon.ico"
+      "favicon": "./public/favicon.ico",
+      "bundler": "metro"
     },
     "extra": {
       "eas": {
         "projectId": "your-project-id"
-      }
+      },
+      "serverUrl": "http://192.168.100.56:8080"
+    },
+    "plugins": [
+      "expo-dev-client"
+    ],
+    "sdkVersion": "50.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "packagerOpts": {
+      "hostType": "lan",
+      "lanType": "ip"
     }
   }
-} 
+}

@@ -1,6 +1,6 @@
 // Import necessary dependencies
-// For development without bundler, we'll use direct import from CDN
-import { BrowserProvider } from 'ethers';
+// For development without bundler, we'll use global ethers from the HTML script tag
+// const { BrowserProvider } = ethers;
 
 // AuthService inline temporarily until we set up proper build process
 class AuthService {
@@ -12,7 +12,14 @@ class AuthService {
   }
 
   isAuthenticated() {
-    return document.cookie.includes('session=');
+    // UPDATED: Check for authentication using multiple possible keys for better compatibility
+    const hasToken = !!localStorage.getItem('auth_token') || !!localStorage.getItem('token');
+    const hasUserId = !!localStorage.getItem('user_id') || !!localStorage.getItem('national_id') || 
+                    !!localStorage.getItem('nationalId') || !!localStorage.getItem('voterId');
+    const isAuthFlag = localStorage.getItem('isAuthenticated') === 'true';
+    
+    // Return true if either the combination of token+ID exists OR the isAuthenticated flag is set
+    return (hasToken && hasUserId) || isAuthFlag;
   }
 
   getCsrfToken() {
@@ -63,7 +70,7 @@ class AuthService {
 
 // Configuration Management
 class ConfigService {
-  static API_URL = '/proxy'; // Default to proxy mode
+  static API_URL = 'http://localhost:8000'; // Set to direct connection
   static API_ENDPOINTS = {
     LOGIN: '/login',
     REGISTER: '/register',
@@ -72,7 +79,7 @@ class ConfigService {
   };
   
   static ENV = {
-    IS_DEVELOPMENT: true, // Set to false in production build
+    IS_DEVELOPMENT: true, // Set to true for development mode
   };
   
   static getApiUrl() {
@@ -114,7 +121,7 @@ class WalletService {
         
         if (accounts && accounts.length > 0) {
           // Initialize provider and signer with existing connection
-          this.provider = new BrowserProvider(window.ethereum);
+          this.provider = new ethers.BrowserProvider(window.ethereum);
           this.signer = await this.provider.getSigner();
           return await this.signer.getAddress();
         }
@@ -125,7 +132,7 @@ class WalletService {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       
       // Initialize provider and signer
-      this.provider = new BrowserProvider(window.ethereum);
+      this.provider = new ethers.BrowserProvider(window.ethereum);
       this.signer = await this.provider.getSigner();
       
       return await this.signer.getAddress();
@@ -196,8 +203,8 @@ class UIService {
     if (!button.dataset.originalText && !isLoading) {
       button.dataset.originalText = button.innerHTML;
     }
-    
-    if (isLoading) {
+        
+        if (isLoading) {
       button.disabled = true;
       button.innerHTML = `<span class="loading-indicator"></span><span>Processing...</span>`;
         } else {
@@ -219,6 +226,63 @@ class UIService {
     const icon = toggleBtn.querySelector('i');
     if (icon) {
       icon.className = type === 'password' ? 'ri-eye-line' : 'ri-eye-off-line';
+    }
+  }
+}
+
+// Debug Service for logging and debugging
+class DebugService {
+  // Log a message to console and debug panel if available
+  static log(message, data = null) {
+    // Always log to console
+    if (data) {
+      console.log(`[DEBUG] ${message}`, data);
+        } else {
+      console.log(`[DEBUG] ${message}`);
+    }
+    
+    // Log to debug panel if it exists
+    const debugContent = document.getElementById('debugContent');
+    if (debugContent) {
+      const timestamp = new Date().toLocaleTimeString();
+      let content = `<div class="text-xs text-gray-300 mb-1"><span class="text-gray-400">${timestamp}</span> ${message}</div>`;
+      
+      if (data) {
+        if (typeof data === 'object') {
+          content += `<pre class="text-xs text-green-400 mb-2 overflow-x-auto">${JSON.stringify(data, null, 2)}</pre>`;
+        } else {
+          content += `<pre class="text-xs text-green-400 mb-2">${data}</pre>`;
+        }
+      }
+      
+      debugContent.innerHTML = content + debugContent.innerHTML;
+    }
+  }
+  
+  // Toggle debug panel visibility
+  static toggle() {
+    const debugPanel = document.getElementById('debugPanel');
+    if (debugPanel) {
+      debugPanel.classList.toggle('hidden');
+      this.log(`Debug panel ${debugPanel.classList.contains('hidden') ? 'hidden' : 'shown'}`);
+    }
+  }
+  
+  // Hide debug panel
+  static hide() {
+    const debugPanel = document.getElementById('debugPanel');
+    if (debugPanel) {
+      debugPanel.classList.add('hidden');
+      console.log('[DEBUG] Panel hidden');
+    }
+  }
+  
+  // Show debug panel
+  static show() {
+    const debugPanel = document.getElementById('debugPanel');
+    if (debugPanel) {
+      debugPanel.classList.remove('hidden');
+      this.log('Debug panel shown');
     }
   }
 }
@@ -289,51 +353,6 @@ class PasswordValidator {
       element.classList.remove('text-gray-600', 'text-green-600');
       element.classList.add(isPassed ? 'text-green-600' : 'text-gray-600');
     });
-  }
-}
-
-// Debug Service
-class DebugService {
-  static isEnabled = ConfigService.ENV.IS_DEVELOPMENT;
-  static panelId = 'debugPanel';
-  static contentId = 'debugContent';
-  
-  static log(message, data = null) {
-    if (!this.isEnabled) return;
-    
-    console.log(message, data);
-    
-    const panel = document.getElementById(this.panelId);
-    const content = document.getElementById(this.contentId);
-    if (!panel || !content) return;
-    
-    const timestamp = new Date().toLocaleTimeString();
-    let html = `<div class="mb-1"><span class="text-gray-400">${timestamp}</span> ${message}</div>`;
-    
-    if (data) {
-      if (typeof data === 'object') {
-        html += `<pre class="text-green-400 text-xs mt-1 mb-2 overflow-x-auto">${JSON.stringify(data, null, 2)}</pre>`;
-      } else {
-        html += `<pre class="text-green-400 text-xs mt-1 mb-2">${data}</pre>`;
-      }
-    }
-    
-    content.innerHTML = html + content.innerHTML;
-  }
-  
-  static show() {
-    const panel = document.getElementById(this.panelId);
-    if (panel) panel.classList.remove('hidden');
-  }
-  
-  static hide() {
-    const panel = document.getElementById(this.panelId);
-    if (panel) panel.classList.add('hidden');
-  }
-  
-  static toggle() {
-    const panel = document.getElementById(this.panelId);
-    if (panel) panel.classList.toggle('hidden');
   }
 }
 
@@ -439,11 +458,18 @@ class ApiService {
         throw new Error("Wallet connection required for login");
       }
       
-      return await this.request(ConfigService.API_ENDPOINTS.LOGIN, 'POST', { 
-        voter_id: nationalId, 
+      const response = await this.request(ConfigService.API_ENDPOINTS.LOGIN, 'POST', { 
+        nationalId, 
         password,
-        wallet_address: walletAddress
+        walletAddress
       });
+      
+      // Ensure we have a valid response with token and user info
+      if (!response.success || !response.token || !response.user) {
+        throw new Error("Invalid response from server");
+      }
+      
+      return response;
     } catch (error) {
       // Enhanced error handling
       if (error.message.includes("wallet")) {
@@ -528,6 +554,7 @@ class LoginManager {
     if (window.ethereum && window.ethereum.selectedAddress) {
       try {
         // There's already a wallet connected, let's update our state
+        // Using DebugService for logging in development mode
         DebugService.log("Found existing wallet connection");
         const address = await this.walletService.connect(true); // silent mode
         if (address) {
@@ -848,6 +875,9 @@ class LoginManager {
       // Include wallet address in login request
       const loginResult = await this.apiService.login(nationalId, password, this.walletAddress);
       
+      // Use our new function to ensure a consistent authentication state
+      this.ensureConsistentAuthState(loginResult);
+      
       // Remember national ID if requested (but not the password!)
       if (rememberMe) {
         this.saveRememberedId(nationalId);
@@ -861,9 +891,34 @@ class LoginManager {
         status: 'success'
       });
       
-      // Redirect based on role
+      // Reset any redirect counters to prevent false detection of redirect loops
+      sessionStorage.removeItem('redirectCounter');
+      
+      // Redirect based on role with a special parameter to indicate fresh login
             setTimeout(() => {
-        window.location.href = loginResult.role === 'admin' ? 'admin.html' : 'index.html';
+        // Check if we should allow the redirect (prevents redirect loops)
+        if (!this.preventRedirectLoop()) {
+          console.error("Redirect blocked to prevent loop - user can manually navigate");
+          // Show an alert to the user
+          UIService.showFeedback('loginFeedback', {
+            message: 'Redirect prevented to avoid a loop. You can manually navigate to the home page.',
+            status: 'warning'
+          });
+          UIService.setLoading(loginButton, false);
+          return;
+        }
+        
+        // Determine destination based on user role
+        const redirectDestination = loginResult.user.role === 'admin' ? 'admin.html' : 'index.html';
+        
+        // Add timestamp to prevent caching issues
+        const timestamp = Date.now();
+        
+        // Log the redirection for debugging
+        console.log(`Redirecting to: ${redirectDestination}?auth=${timestamp}`);
+        
+        // Execute the redirect - SIMPLIFIED DIRECT APPROACH
+        window.location.href = `${redirectDestination}?auth=fresh&time=${timestamp}`;
             }, 1500);
         } catch (error) {
       UIService.showFeedback('loginFeedback', {
@@ -872,6 +927,52 @@ class LoginManager {
       });
       UIService.setLoading(loginButton, false);
     }
+  }
+  
+  // New helper function to ensure consistent authentication state
+  ensureConsistentAuthState(loginResult) {
+    // Clear any existing auth data first
+    localStorage.removeItem('redirectCounter');
+    sessionStorage.removeItem('redirectCounter');
+    
+    // Set all authentication indicators consistently
+    localStorage.setItem('auth_token', loginResult.token);
+    localStorage.setItem('token', loginResult.token); // Add duplicate for compatibility
+    localStorage.setItem('user_id', loginResult.user.id);
+    localStorage.setItem('user_role', loginResult.user.role);
+    localStorage.setItem('role', loginResult.user.role); // Add duplicate for compatibility
+    localStorage.setItem('national_id', loginResult.user.nationalId);
+    localStorage.setItem('nationalId', loginResult.user.nationalId); // Add duplicate for compatibility
+    localStorage.setItem('voterId', loginResult.user.nationalId); // Add duplicate for compatibility
+    localStorage.setItem('wallet_address', loginResult.user.walletAddress);
+    localStorage.setItem('walletAddress', loginResult.user.walletAddress); // Add duplicate for compatibility
+    localStorage.setItem('isAuthenticated', 'true');
+    
+    // Add login timestamp for additional verification - use a precise timestamp
+    const loginTime = Date.now();
+    localStorage.setItem('login_timestamp', loginTime.toString());
+    
+    // Set session flags for authentication tracking
+    sessionStorage.setItem('JUST_LOGGED_IN', 'true');
+    sessionStorage.setItem('LOGIN_TIME', loginTime.toString());
+    
+    // Create a special authentication bridge cookie that's easier for app.js to detect
+    // This will bypass any potential race conditions in localStorage
+    document.cookie = `auth_verified=true; path=/; max-age=3600`;
+    document.cookie = `auth_time=${loginTime}; path=/; max-age=3600`;
+    document.cookie = `auth_user_id=${loginResult.user.id}; path=/; max-age=3600`;
+    document.cookie = `auth_role=${loginResult.user.role}; path=/; max-age=3600`;
+    
+    // Use the authService to save user info
+    this.authService.saveUserInfo(loginResult.user);
+    
+    // Log the authentication state for debugging
+    console.log("Authentication state set with:", {
+      token: loginResult.token ? "exists" : "missing",
+      id: loginResult.user.id,
+      role: loginResult.user.role,
+      loginTime
+    });
   }
   
   // Registration Form Handling
@@ -916,17 +1017,17 @@ class LoginManager {
         message: 'Please fill in all fields', 
         status: 'error'
       });
-      return;
-    }
-    
+            return;
+        }
+        
     if (!acceptedTerms) {
       UIService.showFeedback('registerFeedback', { 
         message: 'You must accept the terms of service', 
         status: 'error'
       });
-      return;
-    }
-    
+            return;
+        }
+        
     // Password strength validation
     const passwordValidation = PasswordValidator.validate(password);
     if (!passwordValidation.isValid) {
@@ -985,7 +1086,7 @@ class LoginManager {
           status: 'success'
         });
       }, 2000);
-    } catch (error) {
+        } catch (error) {
       UIService.showFeedback('registerFeedback', {
         message: error.message || 'Registration failed. Please try again.',
         status: 'error'
@@ -1058,9 +1159,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup theme toggle
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
+      // Update button icon on initialization
+      updateThemeToggleIcon(themeToggle);
+      
       themeToggle.addEventListener('click', () => {
         const html = document.documentElement;
         const isDark = html.classList.contains('dark');
+        
+        // Add click animation immediately
+        themeToggle.classList.add('clicking');
+        setTimeout(() => {
+          themeToggle.classList.remove('clicking');
+        }, 300);
         
         if (isDark) {
           html.classList.remove('dark');
@@ -1070,22 +1180,200 @@ document.addEventListener('DOMContentLoaded', async () => {
           localStorage.setItem('theme', 'dark');
         }
         
+        // Update the theme toggle button appearance
+        updateThemeToggleIcon(themeToggle);
+        
         // Update particles if initialized
         if (typeof updateParticlesTheme === 'function') {
           setTimeout(updateParticlesTheme, 100);
         }
+        
+        // Also apply our custom green particles
+        if (typeof updateParticlesThemeCustom === 'function') {
+          setTimeout(updateParticlesThemeCustom, 200);
+        }
       });
+    }
+  };
+  
+  // Helper function to update theme toggle icon
+  const updateThemeToggleIcon = (toggleButton) => {
+    if (!toggleButton) return;
+    
+    const sunIcon = toggleButton.querySelector('.icon-sun');
+    const moonIcon = toggleButton.querySelector('.icon-moon');
+    
+    if (sunIcon && moonIcon) {
+      const isDark = document.documentElement.classList.contains('dark');
+      
+      // Clear existing classes first for better consistency
+      sunIcon.classList.remove('hidden');
+      moonIcon.classList.remove('hidden');
+      
+      if (isDark) {
+        // Dark mode - show moon, hide sun
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+      } else {
+        // Light mode - show sun, hide moon
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+      }
+      
+      console.log(`Theme toggled to ${isDark ? 'dark' : 'light'} mode, sunIcon hidden: ${sunIcon.classList.contains('hidden')}, moonIcon hidden: ${moonIcon.classList.contains('hidden')}`);
+    }
+  };
+  
+  // Check URL parameters for debug info
+  const checkForDebugInfo = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('redirect_reason') && urlParams.get('redirect_reason') === 'not_authenticated') {
+      // Create or get debug info container
+      let debugInfo = document.getElementById('authDebugInfo');
+      if (!debugInfo) {
+        debugInfo = document.createElement('div');
+        debugInfo.id = 'authDebugInfo';
+        debugInfo.className = 'mt-4 p-2 bg-gray-100 dark:bg-gray-800 text-xs font-mono rounded hidden';
+        
+        // Add a toggle button
+        const toggleButton = document.createElement('button');
+        toggleButton.textContent = 'Show Debug Info';
+        toggleButton.className = 'text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mb-2';
+        toggleButton.onclick = function() {
+          const content = document.getElementById('authDebugContent');
+          if (content) {
+            const isHidden = content.classList.contains('hidden');
+            content.classList.toggle('hidden', !isHidden);
+            this.textContent = isHidden ? 'Hide Debug Info' : 'Show Debug Info';
+          }
+        };
+        
+        const content = document.createElement('div');
+        content.id = 'authDebugContent';
+        content.className = 'hidden';
+        
+        debugInfo.appendChild(toggleButton);
+        debugInfo.appendChild(content);
+        
+        // Add to page
+        const form = document.getElementById('loginFormElement');
+        if (form && form.parentNode) {
+          form.parentNode.insertBefore(debugInfo, form.nextSibling);
+        }
+      }
+      
+      // Update debug content
+      const content = document.getElementById('authDebugContent');
+      if (content) {
+        const debugHtml = `
+          <p class="text-red-500 dark:text-red-400 font-bold">Authentication Failed</p>
+          <ul class="mt-1 space-y-1">
+            <li>Has Token: ${urlParams.get('has_token') || 'N/A'}</li>
+            <li>Has Role: ${urlParams.get('has_role') || 'N/A'}</li>
+            <li>Has ID: ${urlParams.get('has_id') || 'N/A'}</li>
+            <li>Auth Flag: ${urlParams.get('has_auth_flag') || 'N/A'}</li>
+            <li>Fresh Login: ${urlParams.get('fresh_login') || 'N/A'}</li>
+            <li>Recent Login: ${urlParams.get('recent_login') || 'N/A'}</li>
+            <li>Redirect Count: ${urlParams.get('redirect_count') || 'N/A'}</li>
+            <li>Login Time: ${urlParams.get('login_time') || 'N/A'}</li>
+            <li>Cookie Auth: ${urlParams.get('cookie_auth') || 'N/A'}</li>
+            <li>Cookie Time: ${urlParams.get('cookie_time') || 'N/A'}</li>
+            <li>Cookie ID: ${urlParams.get('cookie_id') || 'N/A'}</li>
+            <li>Current Time: ${new Date().toISOString()}</li>
+            <li>Time Diff: ${urlParams.get('login_time') && localStorage.getItem('login_timestamp') ? 
+                 `${Math.round((Date.now() - parseInt(localStorage.getItem('login_timestamp')))/1000)} seconds` : 'N/A'}</li>
+            <li>Redirect Time: ${new Date(parseInt(urlParams.get('time') || '0')).toLocaleString()}</li>
+          </ul>
+          <div class="mt-2">
+            <p class="font-bold">Cookies & LocalStorage:</p>
+            <ul class="mt-1 space-y-1">
+              <li>auth_verified cookie: ${document.cookie.includes('auth_verified=true') ? '✓' : '✗'}</li>
+              <li>auth_user_id cookie: ${(function() {
+                  const match = document.cookie.match(/auth_user_id=([^;]+)/);
+                  return match ? '✓ (' + match[1] + ')' : '✗';
+                })()}</li>
+              <li>auth_time cookie: ${(function() {
+                  const match = document.cookie.match(/auth_time=([^;]+)/);
+                  return match ? '✓ (' + new Date(parseInt(match[1])).toLocaleString() + ')' : '✗';
+                })()}</li>
+              <li>auth_token: ${localStorage.getItem('auth_token') ? '✓' : '✗'}</li>
+              <li>token: ${localStorage.getItem('token') ? '✓' : '✗'}</li>
+              <li>user_id: ${localStorage.getItem('user_id') ? '✓' : '✗'}</li>
+              <li>user_role: ${localStorage.getItem('user_role') ? '✓' : '✗'}</li>
+              <li>national_id: ${localStorage.getItem('national_id') ? '✓' : '✗'}</li>
+              <li>voterId: ${localStorage.getItem('voterId') ? '✓' : '✗'}</li>
+              <li>isAuthenticated: ${localStorage.getItem('isAuthenticated') ? '✓' : '✗'}</li>
+              <li>login_timestamp: ${localStorage.getItem('login_timestamp') ? 
+                  new Date(parseInt(localStorage.getItem('login_timestamp'))).toLocaleString() : 'None'}</li>
+            </ul>
+          </div>
+          <div class="mt-4">
+            <button id="fixAuthButton" class="bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+              Fix Authentication
+            </button>
+          </div>
+        `;
+        
+        content.innerHTML = debugHtml;
+        debugInfo.classList.remove('hidden');
+        
+        // Add event handler for the fix auth button
+        setTimeout(() => {
+          const fixAuthButton = document.getElementById('fixAuthButton');
+          if (fixAuthButton) {
+            fixAuthButton.addEventListener('click', function() {
+              // Set a fresh timestamp
+              const now = Date.now();
+              localStorage.setItem('login_timestamp', now.toString());
+              
+              // Ensure all authentication flags are set
+              localStorage.setItem('isAuthenticated', 'true');
+              
+              // If we have an ID in the URL but not in localStorage, copy it
+              const urlId = urlParams.get('id');
+              if (urlId && !localStorage.getItem('user_id')) {
+                localStorage.setItem('user_id', urlId);
+              }
+              
+              // Set auth cookies as well for more reliability
+              document.cookie = `auth_verified=true; path=/; max-age=3600`;
+              document.cookie = `auth_time=${now}; path=/; max-age=3600`;
+              document.cookie = `auth_user_id=${localStorage.getItem('user_id') || urlId || 'fix'}; path=/; max-age=3600`;
+              document.cookie = `auth_role=${localStorage.getItem('user_role') || localStorage.getItem('role') || 'voter'}; path=/; max-age=3600`;
+              
+              // Set a message and reload in 2 seconds
+              const buttonText = fixAuthButton.textContent;
+              fixAuthButton.textContent = 'Fixing authentication...';
+              fixAuthButton.disabled = true;
+              
+              setTimeout(() => {
+                window.location.href = 'index.html?auth=fresh&from=fix&time=' + Date.now();
+              }, 1500);
+            });
+          }
+        }, 100);
+      }
     }
   };
   
   // Initialize theme
   initializeTheme();
   
+  // Ensure theme toggle icon is updated after DOM is fully loaded
+  setTimeout(() => {
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) updateThemeToggleIcon(themeToggle);
+  }, 100);
+  
+  // Check for debug info
+  checkForDebugInfo();
+  
   // Function to update particles theme
   let updateParticlesTheme;
   
   // Initialize the login manager
   const loginManager = new LoginManager();
+  window.loginManager = loginManager; // Make loginManager globally accessible
   await loginManager.initialize();
   
   // Initialize particles.js if element exists
@@ -1104,7 +1392,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         },
         "color": {
-          "value": isDarkMode ? "#ffffff" : "#000000"
+          "value": "#16a34a"
         },
         "shape": {
           "type": "circle",
@@ -1139,7 +1427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         "line_linked": {
           "enable": true,
           "distance": 150,
-          "color": isDarkMode ? "#ffffff" : "#000000",
+          "color": "#16a34a",
           "opacity": 0.2,
           "width": 1
         },
@@ -1200,17 +1488,162 @@ document.addEventListener('DOMContentLoaded', async () => {
       "retina_detect": true
     });
     
+    // Apply green color theme immediately
+    setTimeout(() => {
+      if (typeof updateParticlesThemeCustom === 'function') {
+        updateParticlesThemeCustom();
+        console.log("Initial green color theme applied to particles");
+      }
+    }, 300);
+    
     // Update particles color on theme change
     updateParticlesTheme = () => {
       const isDark = document.documentElement.classList.contains('dark');
       if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
         const particles = window.pJSDom[0].pJS.particles;
-        particles.color.value = isDark ? "#ffffff" : "#000000";
-        particles.line_linked.color = isDark ? "#ffffff" : "#000000";
-        particles.particles.forEach(p => {
-          p.color.value = isDark ? "#ffffff" : "#000000";
-        });
+        // Use green color for both themes
+        const greenColor = "#16a34a"; // Tailwind green-600
+        particles.color.value = greenColor;
+        particles.line_linked.color = greenColor;
+        
+        // Refresh particles to apply changes
+        if (window.pJSDom[0].pJS.fn && typeof window.pJSDom[0].pJS.fn.particlesRefresh === 'function') {
+          window.pJSDom[0].pJS.fn.particlesRefresh();
+        } else {
+          console.log("particlesRefresh function not available");
+        }
+      } else {
+        console.log("Particles not ready for theme update");
       }
     };
   }
 });
+
+// Add redirect loop prevention function
+function preventRedirectLoop() {
+  // Get or initialize redirect counter
+  let redirectCounter = parseInt(sessionStorage.getItem('redirectCounter') || '0');
+  redirectCounter++;
+  // Store updated count
+  sessionStorage.setItem('redirectCounter', redirectCounter.toString());
+  
+  console.log(`Redirect attempt ${redirectCounter} of 3 max`);
+  
+  // Block if we've exceeded the limit (3 redirects)
+  if (redirectCounter > 3) {
+    console.error("TOO MANY REDIRECTS - Breaking potential loop");
+    sessionStorage.removeItem('redirectCounter'); // Reset counter
+    return false; // Don't allow redirect
+  }
+  
+  return true; // Allow redirect
+}
+
+// Initialize additional handlers when document loads
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("Login page loaded, resetting redirect counter");
+  
+  // Reset redirect counter when explicitly navigating to login page
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('logout') || urlParams.has('signin')) {
+    sessionStorage.removeItem('redirectCounter');
+  }
+  
+  // If page loaded successfully, reset counter after short delay
+  setTimeout(() => {
+    sessionStorage.removeItem('redirectCounter');
+    console.log("Redirect counter reset on login page load");
+  }, 2000);
+});
+
+// Global variables for registration modal
+let loginManagerInstance = null;
+
+// Set up global reference to loginManager on initialization
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait for loginManager to be initialized before storing reference
+  setTimeout(() => {
+    // Find loginManager instance from DOMContentLoaded events
+    if (window.loginManager) {
+      loginManagerInstance = window.loginManager;
+      console.log("Login manager instance captured for global access");
+    }
+  }, 500);
+});
+
+// Global functions for registration modal
+function showRegistrationModal() {
+  console.log("Registration modal opened", loginManagerInstance);
+  if (loginManagerInstance) {
+    loginManagerInstance.showRegistrationModal();
+  } else {
+    // Fallback implementation if loginManager instance isn't available
+    const modal = document.getElementById('registrationModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
+  }
+}
+
+function hideRegistrationModal() {
+  console.log("Registration modal closed", loginManagerInstance);
+  if (loginManagerInstance) {
+    loginManagerInstance.hideRegistrationModal();
+  } else {
+    // Fallback implementation if loginManager instance isn't available
+    const modal = document.getElementById('registrationModal');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+}
+
+// Update particles theme with green color
+function updateParticlesThemeCustom() {
+  console.log("Updating particles theme with custom green color");
+  if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+    const particles = window.pJSDom[0].pJS.particles;
+    // Set custom green color
+    const greenColor = "#16a34a"; // Tailwind green-600
+    particles.color.value = greenColor;
+    particles.line_linked.color = greenColor;
+    
+    // Refresh particles to apply changes
+    if (window.pJSDom[0].pJS.fn && typeof window.pJSDom[0].pJS.fn.particlesRefresh === 'function') {
+      window.pJSDom[0].pJS.fn.particlesRefresh();
+    } else {
+      console.log("particlesRefresh function not available");
+    }
+  } else {
+    console.log("Particles not ready for color update");
+  }
+}
+
+// Function to toggle password visibility
+function togglePasswordVisibility(inputId, toggleBtnId) {
+  console.log("Password visibility toggled", loginManagerInstance);
+  const passwordInput = document.getElementById(inputId);
+  const toggleBtn = document.getElementById(toggleBtnId);
+  
+  if (!passwordInput || !toggleBtn) return;
+  
+  const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+  passwordInput.setAttribute('type', type);
+  
+  // Update icon
+  const icon = toggleBtn.querySelector('i');
+  if (icon) {
+    icon.className = type === 'password' ? 'ri-eye-line' : 'ri-eye-off-line';
+  }
+}
+
+// Global functions for password visibility toggling
+function toggleLoginPassword() {
+  console.log("Password visibility toggled for login");
+  togglePasswordVisibility('password', 'togglePassword');
+}
+
+function toggleRegisterPassword() {
+  console.log("Password visibility toggled for registration");
+  togglePasswordVisibility('registerPassword', 'toggleRegisterPassword');
+}

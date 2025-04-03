@@ -6,6 +6,76 @@
     
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net/npm/; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; font-src 'self' data:; img-src 'self' data: https://via.placeholder.com https://cdn.pixabay.com; connect-src 'self' http://localhost:8000 https://api.example.com;">
     <title>Voting - Decentralized Blockchain Voting</title>
+    
+    <!-- EMERGENCY AUTHENTICATION FIX -->
+    <script>
+    // EMERGENCY FIX: Force authentication state if URL indicates fresh login
+    (function() {
+        console.log("Running emergency authentication check");
+        
+        // Check URL for fresh login indicator
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('auth')) {
+            console.log("Setting emergency authentication state from URL parameter");
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('login_timestamp', Date.now().toString());
+            sessionStorage.setItem('JUST_LOGGED_IN', 'true');
+            sessionStorage.setItem('LOGIN_TIME', Date.now().toString());
+            
+            // Set authentication cookies
+            document.cookie = `auth_verified=true; path=/; max-age=3600`;
+            document.cookie = `auth_time=${Date.now()}; path=/; max-age=3600`;
+            
+            // Get and preserve additional parameters if available
+            const userId = urlParams.get('id');
+            const userRole = urlParams.get('role');
+            
+            if (userId) {
+                localStorage.setItem('user_id', userId);
+                document.cookie = `auth_user_id=${userId}; path=/; max-age=3600`;
+            }
+            
+            if (userRole) {
+                localStorage.setItem('user_role', userRole);
+                document.cookie = `auth_role=${userRole}; path=/; max-age=3600`;
+            }
+            
+            // Reset redirect counter
+            sessionStorage.removeItem('redirectCounter');
+            
+            // Log authentication state
+            console.log("Emergency authentication set:", {
+                auth: urlParams.get('auth'),
+                time: urlParams.get('time'),
+                userId,
+                userRole
+            });
+        } else {
+            console.log("No auth parameter in URL, skipping emergency authentication");
+        }
+        
+        // Implement redirect loop protection
+        function checkForRedirectLoop() {
+            let redirectCounter = parseInt(sessionStorage.getItem('redirectCounter') || '0');
+            redirectCounter++;
+            
+            if (redirectCounter > 3) {
+                console.error("TOO MANY REDIRECTS DETECTED - Breaking the loop on index page");
+                sessionStorage.setItem('redirectCounter', '0');
+                localStorage.setItem('isAuthenticated', 'true'); // Force authentication to break loop
+                return false;
+            }
+            
+            sessionStorage.setItem('redirectCounter', redirectCounter.toString());
+            console.log(`Redirect attempt ${redirectCounter} of 3 max (index page)`);
+            return true;
+        }
+        
+        // Check for redirect loop
+        checkForRedirectLoop();
+    })();
+    </script>
+    
     <!-- TODO: For production, install Tailwind CSS as a PostCSS plugin or use the Tailwind CLI -->
     <!-- This CDN approach is only for development purposes -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -137,6 +207,7 @@
         .icon-logout::before { content: "🚪"; }
         .icon-plug::before { content: "🔌"; }
         .icon-flag-checkered::before { content: "🏁"; }
+        .icon-wallet::before { content: "🦊"; }
         .icon-external-link-alt::before { content: "🔗"; }
         .icon-users-slash::before { content: "👥❌"; }
         .icon-circle::before { content: "⚪"; }

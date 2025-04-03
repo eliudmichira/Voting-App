@@ -3,124 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blockchain Voting - Login</title>
-    
-    <!-- Browser API Polyfill (Must be first in head) -->
-    <script>
-        // Ensure browser object exists
-        if (typeof browser === 'undefined') {
-            console.log('Adding browser polyfill to prevent "browser is not defined" errors');
-            window.browser = window.browser || {};
-            
-            // Create browser.runtime 
-            window.browser.runtime = window.browser.runtime || {
-                sendMessage: function() { 
-                    console.log('Polyfill: browser.runtime.sendMessage called');
-                    return Promise.resolve({success: true}); 
-                },
-                onMessage: {
-                    addListener: function(callback) { 
-                        console.log('Polyfill: browser.runtime.onMessage.addListener called');
-                    },
-                    removeListener: function(callback) {
-                        console.log('Polyfill: browser.runtime.onMessage.removeListener called');
-                    }
-                },
-                getURL: function(path) {
-                    console.log('Polyfill: browser.runtime.getURL called for', path);
-                    return path;
-                },
-                connect: function() {
-                    console.log('Polyfill: browser.runtime.connect called');
-                    return {
-                        onMessage: {
-                            addListener: function() {}
-                        },
-                        postMessage: function() {}
-                    };
-                }
-            };
-            
-            // Create browser.tabs
-            window.browser.tabs = window.browser.tabs || {
-                query: function() { 
-                    console.log('Polyfill: browser.tabs.query called');
-                    return Promise.resolve([]); 
-                },
-                sendMessage: function() {
-                    console.log('Polyfill: browser.tabs.sendMessage called');
-                    return Promise.resolve({success: true});
-                },
-                create: function() {
-                    console.log('Polyfill: browser.tabs.create called');
-                    return Promise.resolve({id: 1});
-                }
-            };
-            
-            // Create browser.storage
-            window.browser.storage = window.browser.storage || {
-                local: {
-                    get: function() {
-                        console.log('Polyfill: browser.storage.local.get called');
-                        return Promise.resolve({});
-                    },
-                    set: function(data) {
-                        console.log('Polyfill: browser.storage.local.set called with', data);
-                        return Promise.resolve();
-                    }
-                },
-                sync: {
-                    get: function() {
-                        console.log('Polyfill: browser.storage.sync.get called');
-                        return Promise.resolve({});
-                    },
-                    set: function(data) {
-                        console.log('Polyfill: browser.storage.sync.set called with', data);
-                        return Promise.resolve();
-                    }
-                }
-            };
-            
-            // Bridge to chrome if available (for extension contexts)
-            if (typeof chrome !== 'undefined') {
-                // Use chrome APIs where available
-                console.log('Chrome API detected, creating bridge from browser to chrome');
-                
-                // For each API, check if chrome has it and use it if available
-                if (chrome.runtime) {
-                    if (chrome.runtime.sendMessage) {
-                        browser.runtime.sendMessage = function() {
-                            return new Promise((resolve) => {
-                                chrome.runtime.sendMessage.apply(chrome.runtime, [...arguments, resolve]);
-                            });
-                        };
-                    }
-                    // Add other runtime methods as needed
-                }
-                
-                // Similar bridges for other APIs
-            }
-            
-            console.log('Browser polyfill created successfully');
-        }
-    </script>
-    
-    <!-- Meta tags -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Secure Blockchain-Based Electoral Management System">
+    <meta name="description" content="Secure login for decentralized blockchain voting platform">
     <meta name="csrf-token" content="" id="csrf-token">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; font-src 'self' data:; img-src 'self' data: https://via.placeholder.com https://cdn.pixabay.com; connect-src 'self' http://localhost:8000 https://api.example.com;">
     <title>Login - IEBC Blockchain Voting System</title>
     
     <!-- Styles -->
-    <!-- 
-    PRODUCTION NOTE: Replace this CDN with a proper Tailwind CSS installation:
-    1. Install Tailwind CSS via npm: npm install -D tailwindcss
-    2. Initialize config: npx tailwindcss init
-    3. Configure PostCSS
-    4. Build CSS: npx tailwindcss -i ./src/input.css -o ./dist/output.css
-    See: https://tailwindcss.com/docs/installation
-    -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Particles.js -->
@@ -562,22 +450,24 @@
     </div>
     
     <main class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md relative overflow-hidden">
-        <!-- Logo and Title - Updated to center IEBC Voting -->
-        <div class="flex flex-col items-center justify-center mb-8">
-            <div class="bg-primary-600 dark:bg-primary-700 p-4 rounded-full mb-3">
-                <span class="icon-vote text-white text-2xl"></span>
+        <!-- Logo and Title -->
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center">
+                <div class="bg-primary-600 dark:bg-primary-700 p-3 rounded-full">
+                    <span class="icon-vote text-white text-xl"></span>
                 </div>
-            <h1 class="text-3xl font-bold text-center text-gray-900 dark:text-white">Blockchain Voting</h1>
+                <h1 class="ml-3 text-2xl font-bold text-gray-900 dark:text-white">IEBC Voting</h1>
+            </div>
             
-            <!-- Theme Toggle Button - Moved to top right corner -->
-            <button id="themeToggle" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                <span class="icon-sun text-yellow-500 dark:hidden">☀️</span>
-                <span class="icon-moon text-blue-300 hidden dark:block">🌙</span>
+            <!-- Theme Toggle Button -->
+            <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                <span class="icon-sun text-yellow-500 dark:hidden"></span>
+                <span class="icon-moon text-blue-300 hidden dark:block"></span>
             </button>
         </div>
         
-        <!-- Connection Status Indicator - Moved below the title -->
-        <div class="flex items-center justify-center mb-4" id="connectionIndicator">
+        <!-- Connection Status Indicator -->
+        <div class="absolute top-4 right-4 flex items-center" id="connectionIndicator">
             <div class="w-2 h-2 rounded-full bg-yellow-500 mr-2 pulse-animation" id="connectionDot"></div>
             <span class="text-xs text-gray-600 dark:text-gray-400 font-medium" id="connectionText">Checking connection...</span>
         </div>
@@ -600,7 +490,7 @@
             </div>
             
             <!-- Integrated Login Form -->
-            <form id="loginFormElement" class="space-y-5" onsubmit="event.preventDefault(); console.log('Form submitted via onsubmit'); return false;">
+            <form id="loginFormElement" class="space-y-5">
                 <div>
                     <label for="nationalId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">National ID Number</label>
                     <div class="relative">
@@ -634,8 +524,7 @@
                                 <span class="icon-wallet text-gray-500 dark:text-gray-400"></span>
                                 <span class="text-sm text-gray-700 dark:text-gray-300">Connect your MetaMask wallet</span>
                             </div>
-                            <button type="button" id="connectWalletBtn" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded" 
-                                onclick="connectMetaMask('login')">
+                            <button type="button" id="connectWalletBtn" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded">
                                 Connect
                             </button>
                         </div>
@@ -663,7 +552,7 @@
                 </div>
                 
                 <!-- Submit button -->
-                <button type="button" id="loginButton" class="w-full flex justify-center items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors">
+                <button type="submit" id="loginButton" class="w-full flex justify-center items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors">
                     <span class="icon-sign-in-alt"></span>
                     <span>Login with ID & Wallet</span>
                 </button>
@@ -675,7 +564,7 @@
             <!-- Registration Link -->
             <div class="mt-4 text-center">
                 <span class="text-sm text-gray-600 dark:text-gray-400">Don't have an account?</span>
-                <button id="showRegistrationForm" class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 ml-1" onclick="showRegistrationModal()">
+                <button id="showRegistrationForm" class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 ml-1">
                     Create an account
                 </button>
             </div>
@@ -703,7 +592,7 @@
     <!-- Registration Modal -->
     <div id="registrationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md relative">
-            <button id="closeRegistrationModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" onclick="hideRegistrationModal()">
+            <button id="closeRegistrationModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                 <span class="icon-times"></span>
             </button>
             
@@ -782,8 +671,7 @@
                                 <span class="icon-wallet text-gray-500 dark:text-gray-400"></span>
                                 <span class="text-sm text-gray-700 dark:text-gray-300">Connect your MetaMask wallet</span>
                             </div>
-                            <button type="button" id="registerConnectWalletBtn" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded" 
-                                onclick="connectMetaMask('register')">
+                            <button type="button" id="registerConnectWalletBtn" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded">
                                 Connect
                             </button>
                         </div>
@@ -812,8 +700,7 @@
                 
                 <!-- Register Button -->
                 <button type="button" id="completeRegistrationBtn"
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-800 transition-colors"
-                    onclick="handleRegistrationSubmit()">
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-800 transition-colors">
                     <span class="icon-user-plus mr-2"></span>
                     Create Account with ID & Wallet
                 </button>
@@ -831,32 +718,6 @@
     <script>
         // Fix for browser is not defined error
         const browserSupport = typeof window !== 'undefined' ? window : null;
-        // The comprehensive browser polyfill is already added at the top of the document
-        console.log('Using comprehensive browser polyfill defined earlier in the page');
-        
-        // Fix the theme toggle button
-        document.addEventListener('DOMContentLoaded', function() {
-            const themeToggle = document.getElementById('themeToggle');
-            if (themeToggle) {
-                // Get the sun and moon icons
-                const sunIcon = themeToggle.querySelector('.icon-sun');
-                const moonIcon = themeToggle.querySelector('.icon-moon');
-                
-                if (sunIcon && moonIcon) {
-                    // Fix the initial classes
-                    const isDark = document.documentElement.classList.contains('dark');
-                    if (isDark) {
-                        sunIcon.classList.add('hidden');
-                        moonIcon.classList.remove('hidden');
-                    } else {
-                        sunIcon.classList.remove('hidden');
-                        moonIcon.classList.add('hidden');
-                    }
-                    
-                    console.log(`Theme toggle initialized: dark mode = ${isDark}, sunIcon hidden = ${sunIcon.classList.contains('hidden')}, moonIcon hidden = ${moonIcon.classList.contains('hidden')}`);
-                }
-            }
-        });
     </script>
     
     <!-- Main functionality script -->
@@ -1004,7 +865,9 @@
                 console.error('Error during login:', error);
                 
                 // Show error message
-                showFeedback(document.getElementById('loginFeedback'), 'Server connection error. Please try again later.', true);
+                showFeedback(document.getElementById('loginFeedback'), 
+                    'Server connection error. Please try again later.', 
+                    true);
                 
                 // Reset button state
                 if (loginButton) {
@@ -1096,7 +959,7 @@
             });
             
             // CRITICAL: Break redirect loops
-            // Only redirect to index if the user is authenticated AND has a token
+            // Only redirect to index if the user is authenticated and not trying to sign out or was redirected
             if (isAuthenticated === 'true' && token && !redirectReason) {
                 console.log("User is already logged in, checking for redirect loop");
                 
@@ -1123,21 +986,6 @@
                 // Reset redirect counter on login page
                 sessionStorage.setItem('redirectCounter', 0);
             }
-            
-            // Fix inconsistent authentication state
-            function cleanupAuthState() {
-                const isAuthenticated = localStorage.getItem('isAuthenticated');
-                const token = localStorage.getItem('token');
-                
-                // If isAuthenticated is true but no token exists, clear the inconsistent state
-                if (isAuthenticated === 'true' && !token) {
-                    console.log("Cleaning up inconsistent authentication state...");
-                    localStorage.removeItem('isAuthenticated');
-                }
-            }
-            
-            // Run cleanup on page load
-            cleanupAuthState();
             
             console.log("Login page initial check complete");
         });
@@ -1283,54 +1131,16 @@
             }
             
            // MetaMask connection function
-           const connectMetaMask = async (context) => {
+           const connectMetaMask = async () => {
                         if (!window.ethereum) {
-                            const feedbackElement = context === 'login' ? 
-                               document.getElementById('loginFeedback') : 
-                               document.getElementById('registerFeedback');
-                            
-                            showFeedback(feedbackElement, 'MetaMask is not installed. Please install MetaMask to continue.', true);
+                            showFeedback(document.getElementById('loginFeedback'), 'MetaMask is not installed. Please install MetaMask to continue.', true);
                    return null;
-                        }
-                        
-                        const connectBtn = context === 'login' ? 
-                           document.getElementById('connectWalletBtn') : 
-                           document.getElementById('registerConnectWalletBtn');
-                       
-                        if (connectBtn) {
-                           setLoading(connectBtn, true);
                         }
                         
                try {
                         // Request accounts from MetaMask
                         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                         const address = accounts[0];
-                        currentWalletAddress = address;
-                        
-                        // Update UI based on context
-                        if (context === 'login') {
-                            // Update login form UI
-                            const walletAddress = document.getElementById('walletAddress');
-                            const walletNotConnected = document.getElementById('walletNotConnected');
-                            const walletConnected = document.getElementById('walletConnected');
-                            
-                            if (walletAddress) walletAddress.textContent = formatWalletAddress(address);
-                            if (walletNotConnected) walletNotConnected.classList.add('hidden');
-                            if (walletConnected) walletConnected.classList.remove('hidden');
-                            
-                            showFeedback(document.getElementById('loginFeedback'), 'Wallet connected successfully!', false);
-                        } else {
-                            // Update registration form UI
-                            const registerWalletAddress = document.getElementById('registerWalletAddress');
-                            const registerWalletNotConnected = document.getElementById('registerWalletNotConnected');
-                            const registerWalletConnected = document.getElementById('registerWalletConnected');
-                            
-                            if (registerWalletAddress) registerWalletAddress.textContent = formatWalletAddress(address);
-                            if (registerWalletNotConnected) registerWalletNotConnected.classList.add('hidden');
-                            if (registerWalletConnected) registerWalletConnected.classList.remove('hidden');
-                            
-                            showFeedback(document.getElementById('registerFeedback'), 'Wallet connected successfully!', false);
-                        }
                         
                    // Use the wrapper to get a proper provider
                    let provider = null;
@@ -1343,16 +1153,8 @@
                    return { address, provider };
                } catch (error) {
                    console.error('Error connecting to MetaMask:', error);
-                   const feedbackElement = context === 'login' ? 
-                      document.getElementById('loginFeedback') : 
-                      document.getElementById('registerFeedback');
-                   
-                   showFeedback(feedbackElement, `Failed to connect: ${error.message}`, true);
+                   showFeedback(document.getElementById('loginFeedback'), `Failed to connect: ${error.message}`, true);
                    return null;
-               } finally {
-                  if (connectBtn) {
-                     setLoading(connectBtn, false);
-                  }
                }
            };
            
@@ -1368,6 +1170,15 @@
            const walletConnected = document.getElementById('walletConnected');
            const walletAddress = document.getElementById('walletAddress');
            
+           // Connect wallet button for registration form
+           const registerConnectWalletBtn = document.getElementById('registerConnectWalletBtn');
+           const registerWalletNotConnected = document.getElementById('registerWalletNotConnected');
+           const registerWalletConnected = document.getElementById('registerWalletConnected');
+           const registerWalletAddress = document.getElementById('registerWalletAddress');
+           
+           // Keep track of current wallet
+           let currentWalletAddress = '';
+           
            // Connect wallet functionality (login form)
            if (connectWalletBtn) {
                connectWalletBtn.addEventListener('click', async function() {
@@ -1376,18 +1187,24 @@
                    try {
                        setLoading(this, true);
                        
-                       const result = await connectMetaMask('login');
+                       const result = await connectMetaMask();
                        if (!result) {
                            setLoading(this, false);
                            return;
                        }
                        
                        const { address } = result;
+                       currentWalletAddress = address;
                        
                        // Update UI for login form
                        if (walletAddress) walletAddress.textContent = formatWalletAddress(address);
                        if (walletNotConnected) walletNotConnected.classList.add('hidden');
                        if (walletConnected) walletConnected.classList.remove('hidden');
+                       
+                       // Update UI for registration form (if visible)
+                       if (registerWalletAddress) registerWalletAddress.textContent = formatWalletAddress(address);
+                       if (registerWalletNotConnected) registerWalletNotConnected.classList.add('hidden');
+                       if (registerWalletConnected) registerWalletConnected.classList.remove('hidden');
                        
                        showFeedback(document.getElementById('loginFeedback'), 'Wallet connected successfully!', false);
                        setLoading(this, false);
@@ -1399,17 +1216,136 @@
                 });
             }
             
-            // Add login button handler
+           // Connect wallet functionality (registration form)
+           if (registerConnectWalletBtn) {
+               registerConnectWalletBtn.addEventListener('click', async function() {
+                   debugLog('Register connect wallet button clicked');
+                   
+                   try {
+                       setLoading(this, true);
+                       
+                       const result = await connectMetaMask();
+                       if (!result) {
+                           setLoading(this, false);
+                           return;
+                       }
+                       
+                       const { address } = result;
+                       currentWalletAddress = address;
+                       
+                       // Update UI for registration form
+                       if (registerWalletAddress) registerWalletAddress.textContent = formatWalletAddress(address);
+                       if (registerWalletNotConnected) registerWalletNotConnected.classList.add('hidden');
+                       if (registerWalletConnected) registerWalletConnected.classList.remove('hidden');
+                       
+                       // Update UI for login form (if visible)
+                       if (walletAddress) walletAddress.textContent = formatWalletAddress(address);
+                       if (walletNotConnected) walletNotConnected.classList.add('hidden');
+                       if (walletConnected) walletConnected.classList.remove('hidden');
+                       
+                       showFeedback(document.getElementById('registerFeedback'), 'Wallet connected successfully!', false);
+                       setLoading(this, false);
+                   } catch (error) {
+                       console.error('Error connecting to MetaMask:', error);
+                       showFeedback(document.getElementById('registerFeedback'), `Failed to connect: ${error.message}`, true);
+                       setLoading(this, false);
+                   }
+               });
+           }
+           
+           // Login form submission
+           const loginFormElement = document.getElementById('loginFormElement');
            const loginButton = document.getElementById('loginButton');
-            if (loginButton) {
-                loginButton.addEventListener('click', function() {
-                    console.log('Login button clicked via event listener');
+           
+           if (loginFormElement) {
+               loginFormElement.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
                    const nationalId = document.getElementById('nationalId').value;
                     const password = document.getElementById('password').value;
-                    const rememberMe = document.getElementById('rememberMe').checked;
+                   const rememberMe = document.getElementById('rememberMe')?.checked || false;
                     
-                    // Use the existing processLogin function
-                    processLogin(nationalId, password, rememberMe);
+                    // Validate inputs
+                   if (!nationalId || !password) {
+                        showFeedback(document.getElementById('loginFeedback'), 'Please fill in all fields', true);
+                        return;
+                    }
+                   
+                   // Check if wallet is connected
+                   if (!currentWalletAddress) {
+                       showFeedback(document.getElementById('loginFeedback'), 'Please connect your MetaMask wallet to continue', true);
+                       return;
+                   }
+                    
+                    // Set loading state
+                    setLoading(loginButton, true);
+                    
+                   // Call our database API to authenticate
+                   fetch('http://localhost:8000/api/login', {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'application/json'
+                       },
+                       body: JSON.stringify({
+                           nationalId: nationalId,
+                           password: password
+                       })
+                   })
+                   .then(response => {
+                       if (!response.ok) {
+                           // If response is not ok (like 401), throw an error to go to the fallback flow
+                           throw new Error(`API request failed with status ${response.status}`);
+                       }
+                       return response.json();
+                   })
+                   .then(data => {
+                       if (data.success) {
+                           // Login successful
+                           debugLog('Login successful', data);
+                           
+                           // Store auth data in localStorage
+                           localStorage.setItem('token', data.token);
+                           localStorage.setItem('nationalId', nationalId);
+                           localStorage.setItem('voterId', nationalId);
+                           localStorage.setItem('walletAddress', currentWalletAddress || data.user.walletAddress);
+                           localStorage.setItem('role', data.user.role);
+                           localStorage.setItem('isAuthenticated', 'true');
+                           
+                           if (rememberMe) {
+                               localStorage.setItem('rememberedNationalId', nationalId);
+                               // Set expiration for 30 days
+                               const expires = new Date();
+                               expires.setDate(expires.getDate() + 30);
+                               localStorage.setItem('rememberMeExpires', expires.getTime());
+                           }
+                           
+                           // Show success message
+                           showFeedback(document.getElementById('loginFeedback'), 'Login successful! Redirecting...', false);
+                           
+                           // Redirect to the appropriate page with auth timestamp
+                    setTimeout(() => {
+                               // Add a timestamp to prevent caching issues
+                               const timestamp = new Date().getTime();
+                               console.log("Redirecting after successful login");
+                               window.location.href = (data.user.role === 'admin' ? 'admin.html' : 'index.html') + 
+                                   '?auth=' + timestamp;
+                           }, 1000);
+                       } else {
+                           // Login failed
+                           showFeedback(document.getElementById('loginFeedback'), data.message || 'Login failed', true);
+                       }
+                   })
+                   .catch(error => {
+                       console.error('Error during login:', error);
+                       
+                       // Show error message
+                       showFeedback(document.getElementById('loginFeedback'), 
+                           'Unable to connect to authentication service. Please try again later.', 
+                           true);
+                       
+                       // Reset login button
+                       setLoading(loginButton, false);
+                   });
                });
            }
            
@@ -1421,6 +1357,16 @@
                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                    passwordInput.setAttribute('type', type);
                    debugLog('Password visibility toggled');
+               });
+           }
+           
+           const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+           const registerPasswordInput = document.getElementById('registerPassword');
+           if (toggleRegisterPassword && registerPasswordInput) {
+               toggleRegisterPassword.addEventListener('click', function() {
+                   const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                   registerPasswordInput.setAttribute('type', type);
+                   debugLog('Register password visibility toggled');
                });
            }
            
@@ -1448,10 +1394,9 @@
            }
            
            // Registration modal functionality
-           let registrationModal = document.getElementById('registrationModal');
+           const registrationModal = document.getElementById('registrationModal');
            const closeRegistrationModal = document.getElementById('closeRegistrationModal');
            const showRegistrationForm = document.getElementById('showRegistrationForm');
-           const registerPasswordInput = document.getElementById('registerPassword');
            
            if (showRegistrationForm && registrationModal) {
                showRegistrationForm.addEventListener('click', function() {
@@ -1556,7 +1501,7 @@
                            
                            // Close modal after a delay
                     setTimeout(() => {
-                               hideRegistrationModal();
+                               registrationModal.classList.add('hidden');
                            }, 2000);
                        } else {
                            // Registration failed
@@ -1579,7 +1524,7 @@
                            
                            // Close modal after a delay
                            setTimeout(() => {
-                               hideRegistrationModal();
+                               registrationModal.classList.add('hidden');
                            }, 2000);
                        } else {
                            showFeedback(registerFeedback, 'Connection error. Please make sure the Database API is running.', true);
@@ -1609,6 +1554,11 @@
                            if (walletAddress) walletAddress.textContent = formatWalletAddress(address);
                            if (walletNotConnected) walletNotConnected.classList.add('hidden');
                            if (walletConnected) walletConnected.classList.remove('hidden');
+                           
+                           // Update registration form UI
+                           if (registerWalletAddress) registerWalletAddress.textContent = formatWalletAddress(address);
+                           if (registerWalletNotConnected) registerWalletNotConnected.classList.add('hidden');
+                           if (registerWalletConnected) registerWalletConnected.classList.remove('hidden');
                            
                            // Show a notification that we're already connected
                            const loginFeedback = document.getElementById('loginFeedback');
@@ -1642,6 +1592,10 @@
                        if (walletNotConnected) walletNotConnected.classList.remove('hidden');
                        if (walletConnected) walletConnected.classList.add('hidden');
                        
+                       // Update registration form UI
+                       if (registerWalletNotConnected) registerWalletNotConnected.classList.remove('hidden');
+                       if (registerWalletConnected) registerWalletConnected.classList.add('hidden');
+                       
                        showFeedback(
                            document.getElementById('loginFeedback'), 
                            'MetaMask wallet disconnected. Please reconnect to continue.', 
@@ -1655,6 +1609,11 @@
                        if (walletAddress) walletAddress.textContent = formatWalletAddress(currentWalletAddress);
                        if (walletNotConnected) walletNotConnected.classList.add('hidden');
                        if (walletConnected) walletConnected.classList.remove('hidden');
+                       
+                       // Update registration form UI
+                       if (registerWalletAddress) registerWalletAddress.textContent = formatWalletAddress(currentWalletAddress);
+                       if (registerWalletNotConnected) registerWalletNotConnected.classList.add('hidden');
+                       if (registerWalletConnected) registerWalletConnected.classList.remove('hidden');
                        
                        showFeedback(
                            document.getElementById('loginFeedback'),
@@ -1721,269 +1680,8 @@
            } else {
                document.documentElement.classList.remove('dark');
            }
-           
-           // Track wallet connection
-           let currentWalletAddress = '';
-           
-           // Function to show registration modal
-           function showRegistrationModal() {
-               const modal = registrationModal; // Use the existing variable instead of declaring a new one
-               if (modal) {
-                   modal.classList.remove('hidden');
-                   debugLog('Registration modal opened');
-               }
-           }
-           
-           // Function to hide registration modal
-           function hideRegistrationModal() {
-               const modal = registrationModal; // Use the existing variable instead of declaring a new one
-               if (modal) {
-                   modal.classList.add('hidden');
-                   debugLog('Registration modal closed');
-               }
-           }
-           
-           // Function to handle registration submission
-           function handleRegistrationSubmit() {
-               const registerNationalId = document.getElementById('registerNationalId');
-               const registerPassword = document.getElementById('registerPassword');
-               const acceptTerms = document.getElementById('acceptTerms');
-               const registerFeedback = document.getElementById('registerFeedback');
-               
-               if (!registerNationalId || !registerPassword || !acceptTerms || !registerFeedback) {
-                   console.error('Required registration elements not found');
-                   return;
-               }
-               
-               const nationalId = registerNationalId.value;
-               const password = registerPassword.value;
-               const termsAccepted = acceptTerms.checked;
-                
-               // Validate inputs
-               if (!nationalId || !password) {
-                   showFeedback(registerFeedback, 'Please fill in all fields', true);
-                   return;
-               }
-               
-               if (!termsAccepted) {
-                   showFeedback(registerFeedback, 'Please accept the Terms of Service', true);
-                   return;
-               }
-               
-               // Check if wallet is connected
-               if (!currentWalletAddress) {
-                   showFeedback(registerFeedback, 'Please connect your MetaMask wallet to continue', true);
-                   return;
-               }
-               
-               // Validate password strength
-               const score = updatePasswordStrength(password, 'registerPassword');
-               if (score < 3) {
-                   showFeedback(registerFeedback, 'Please use a stronger password', true);
-                   return;
-               }
-               
-               const completeRegistrationBtn = document.getElementById('completeRegistrationBtn');
-               // Set loading state
-               setLoading(completeRegistrationBtn, true);
-               
-               // Call our database API to register the user
-               fetch('http://localhost:8000/api/register', {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'application/json'
-                   },
-                   body: JSON.stringify({
-                       nationalId: nationalId,
-                       password: password,
-                       walletAddress: currentWalletAddress
-                   })
-               })
-               .then(response => response.json())
-               .then(data => {
-                   if (data.success) {
-                       // Registration successful
-                       showFeedback(registerFeedback, 'Account created and wallet linked successfully!', false);
-                       
-                       // Auto-fill login form after successful registration
-                       const loginNationalId = document.getElementById('nationalId');
-                       if (loginNationalId) {
-                           loginNationalId.value = nationalId;
-                       }
-                       
-                       // Close modal after a delay
-                       setTimeout(() => {
-                           hideRegistrationModal();
-                       }, 2000);
-                   } else {
-                       // Registration failed
-                       showFeedback(registerFeedback, data.message || 'Registration failed', true);
-                   }
-               })
-               .catch(error => {
-                   console.error('Error registering user:', error);
-                   
-                   // Fallback for demo purposes when the API isn't running
-                   if (!window.location.hostname.includes('localhost')) {
-                       // Simulate successful registration
-                       showFeedback(registerFeedback, 'Account created and wallet linked successfully! (Demo mode)', false);
-                       
-                       // Auto-fill login form after successful registration
-                       const loginNationalId = document.getElementById('nationalId');
-                       if (loginNationalId) {
-                           loginNationalId.value = nationalId;
-                       }
-                       
-                       // Close modal after a delay
-                       setTimeout(() => {
-                           hideRegistrationModal();
-                       }, 2000);
-                   } else {
-                       showFeedback(registerFeedback, 'Connection error. Please make sure the Database API is running.', true);
-                   }
-               })
-               .finally(() => {
-                   setLoading(completeRegistrationBtn, false);
-               });
-           }
-           
-           // Function to process login
-           function processLogin(nationalId, password, rememberMe) {
-               console.log(`Login attempt for: ${nationalId}, password length: ${password.length}, remember me: ${rememberMe}, wallet connected: ${currentWalletAddress ? 'Yes' : 'No'}`);
-               
-               // Validate inputs
-               if (!nationalId || !password) {
-                   showFeedback(document.getElementById('loginFeedback'), 'Please fill in all fields', true);
-                   return;
-               }
-               
-               if (!currentWalletAddress) {
-                   showFeedback(document.getElementById('loginFeedback'), 'Please connect your MetaMask wallet first', true);
-                   return;
-               }
-               
-               // Set loading state
-               const loginButton = document.getElementById('loginButton');
-               const loginFeedback = document.getElementById('loginFeedback');
-               setLoading(loginButton, true);
-               
-               try {
-                   // Make API request to login endpoint
-                   console.log(`Making login request with: ${nationalId}, wallet: ${currentWalletAddress}`);
-                   fetch('http://localhost:8000/api/login', {
-                       method: 'POST',
-                       headers: {
-                           'Content-Type': 'application/json'
-                       },
-                       body: JSON.stringify({
-                           nationalId,
-                           password,
-                           walletAddress: currentWalletAddress
-                       })
-                   })
-                   .then(response => {
-                       if (!response.ok) {
-                           throw new Error(`API request failed with status ${response.status}`);
-                       }
-                       return response.json();
-                   })
-                   .then(data => {
-                       if (data.success) {
-                           // Login successful
-                           debugLog('Login successful', data);
-                           
-                           // Store auth data in localStorage
-                           localStorage.setItem('token', data.token);
-                           localStorage.setItem('nationalId', nationalId);
-                           localStorage.setItem('voterId', nationalId);
-                           localStorage.setItem('walletAddress', currentWalletAddress || data.user.walletAddress);
-                           localStorage.setItem('role', data.user.role);
-                           localStorage.setItem('isAuthenticated', 'true');
-                           localStorage.setItem('login_timestamp', Date.now().toString());
-                           
-                           // Store user info if provided
-                           if (data.user) {
-                               localStorage.setItem('user_id', data.user.id);
-                               localStorage.setItem('user_role', data.user.role);
-                           }
-                           
-                           if (rememberMe) {
-                               localStorage.setItem('rememberedNationalId', nationalId);
-                               // Set expiration for 30 days
-                               const expires = new Date();
-                               expires.setDate(expires.getDate() + 30);
-                               localStorage.setItem('rememberMeExpires', expires.getTime());
-                           }
-                           
-                           // Show success message
-                           showFeedback(loginFeedback, 'Login successful! Redirecting...', false);
-                           
-                           // Reset redirect counter
-                           sessionStorage.removeItem('redirectCounter');
-                           
-                           // Redirect to the appropriate page with auth timestamp
-                           setTimeout(() => {
-                               // Add a timestamp to prevent caching issues
-                               const timestamp = Date.now();
-                               console.log("Redirecting after successful login");
-                               window.location.href = (data.user.role === 'admin' ? 'admin.html' : 'index.html') + 
-                                   '?auth=' + timestamp;
-                           }, 1000);
-                       } else {
-                           // Login failed
-                           showFeedback(loginFeedback, data.message || 'Login failed', true);
-                           setLoading(loginButton, false);
-                       }
-                   })
-                   .catch(error => {
-                       console.error('Error during login:', error);
-                       
-                       // Show error message
-                       showFeedback(loginFeedback, 
-                           'Unable to connect to authentication service. Please try again later.', 
-                           true);
-                       
-                       // Reset login button
-                       setLoading(loginButton, false);
-                   });
-               } catch (error) {
-                   console.error('Login error:', error);
-                   showFeedback(loginFeedback, `Error: ${error.message}`, true);
-                   setLoading(loginButton, false);
-               }
-           }
-           
-           // Toggle password visibility for registration
-           const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
-           if (toggleRegisterPassword && registerPasswordInput) {
-               toggleRegisterPassword.addEventListener('click', () => {
-                   const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                   registerPasswordInput.setAttribute('type', type);
-                   debugLog('Register password visibility toggled');
-               });
-           }
-           
-           // Add password input event for registration
-           if (registerPasswordInput) {
-               registerPasswordInput.addEventListener('input', function() {
-                   updatePasswordStrength(this.value, 'registerPassword');
-               });
-           }
-           
-           // Close registration modal when clicking outside
-           const modal = document.getElementById('registrationModal');
-           if (modal) {
-               modal.addEventListener('click', function(e) {
-                   if (e.target === this) {
-                       hideRegistrationModal();
-                   }
-               });
-           }
         });
     </script>
-    
-    <!-- Import login.js -->
-    <script src="/js/login.js"></script>
     
     <!-- Enhanced particles animation script -->
     <script>

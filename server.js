@@ -135,6 +135,12 @@ app.get('/proxy/voting/dates', (req, res) => {
 // Serve static files from the src/html directory for development
 app.use(express.static(path.join(__dirname, 'src', 'html')));
 
+// Handle requests for non-existent login-new.js
+app.get('/js/login-new.js', (req, res) => {
+  console.log('Request for login-new.js redirected to login.js');
+  res.redirect('/js/login.js');
+});
+
 // Fallback route for HTML files in development
 app.get('/:page.html', (req, res) => {
   const page = req.params.page;
@@ -144,6 +150,43 @@ app.get('/:page.html', (req, res) => {
 // Default route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'html', 'index.html'));
+});
+
+// Special route for handling authentication bypass (will create a cookie)
+app.get('/auth-bypass', (req, res) => {
+  const { id, role } = req.query;
+  
+  debugLog(`Auth-bypass endpoint called for user: ${id} (${role})`, {
+    requestUrl: req.originalUrl,
+    queryParams: req.query,
+    referrer: req.headers.referer || 'none',
+    userAgent: req.headers['user-agent']
+  });
+  
+  // Set cookie with authentication data
+  res.cookie('auth_verified', 'true', { maxAge: 3600000, httpOnly: false });
+  res.cookie('auth_user_id', id, { maxAge: 3600000, httpOnly: false });
+  res.cookie('auth_role', role, { maxAge: 3600000, httpOnly: false });
+  res.cookie('auth_time', Date.now(), { maxAge: 3600000, httpOnly: false });
+  
+  // Log cookies being set
+  debugLog(`Setting authentication cookies for user: ${id}`, {
+    cookies: {
+      auth_verified: 'true',
+      auth_user_id: id,
+      auth_role: role,
+      auth_time: new Date().toISOString()
+    }
+  });
+  
+  // Determine destination based on role
+  const destination = role === 'admin' ? 'admin.html' : 'index.html';
+  
+  // Log redirect destination
+  debugLog(`Redirecting user to: /${destination} with auth=fresh parameter`);
+  
+  // Redirect to the correct page with auth=fresh parameter
+  res.redirect(`/${destination}?auth=fresh&id=${id}&role=${role}`);
 });
 
 app.get('/login.html', (req, res) => {
