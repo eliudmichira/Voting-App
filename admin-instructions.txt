@@ -1,0 +1,1 @@
+// Add this to your browser console to enable admin mode: localStorage.setItem('user_role', 'admin'); document.querySelectorAll('.admin-controls').forEach(el => el.style.display = 'block');

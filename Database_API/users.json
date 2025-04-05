@@ -7,7 +7,7 @@
       "passwordSalt": "fb279b659cfaf741220a046edab84cb4",
       "walletAddress": "0x577a71aeae2c21d56b0c99d1e7c568fcc2391587",
       "created": "2025-03-23T06:50:10.778Z",
-      "lastLogin": "2025-04-03T06:08:52.295Z",
+      "lastLogin": "2025-04-05T13:48:04.202Z",
       "role": "voter"
     },
     {
@@ -17,7 +17,7 @@
       "passwordSalt": "c9d72351ffb4df3635573958ab54431e",
       "walletAddress": "0x0b26432e4c0a4db3bcea7feff8e11f66468731f5",
       "created": "2025-03-23T06:53:40.946Z",
-      "lastLogin": "2025-04-01T08:43:14.567Z",
+      "lastLogin": "2025-04-05T12:26:05.954Z",
       "role": "admin"
     },
     {

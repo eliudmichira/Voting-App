@@ -182,11 +182,41 @@
         .icon-sign-in-alt::before { content: "🚪"; }
         .icon-user-plus::before { content: "👤+"; }
         .icon-times-circle::before { content: "❌"; }
+        .icon-eye-slash::before { content: "👁️‍🗨️"; }
         
         /* Icon spacing */
         [class^="icon-"] {
             display: inline-block;
             margin-right: 0.25rem;
+        }
+        
+        /* Improved eye icon styles for password visibility */
+        .icon-eye::before { 
+            content: "👁️"; 
+            font-size: 1.2rem;
+            display: inline-block;
+        }
+        
+        .icon-eye-slash::before { 
+            content: "👁️‍🗨️"; 
+            font-size: 1.2rem;
+            display: inline-block;
+        }
+        
+        /* Password toggle styles */
+        .toggle-btn .icon-eye,
+        .toggle-btn .icon-eye-slash {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            margin-right: 0;
+        }
+        
+        .toggle-btn:hover .icon-eye,
+        .toggle-btn:hover .icon-eye-slash {
+            transform: scale(1.1);
         }
         
         /* Blockchain background */
@@ -323,6 +353,8 @@
             border-radius: 0.5rem;
             font-weight: 500;
             transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
         }
         
         .btn-primary {
@@ -332,6 +364,13 @@
         
         .btn-primary:hover {
             background-color: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
         
         .btn-metamask {
@@ -341,44 +380,85 @@
         
         .btn-metamask:hover {
             background-color: #e27625;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         
-        /* Ripple effect */
-        .btn-ripple {
+        .btn-metamask:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Toggle button styles */
+        .toggle-btn {
+            transition: all 0.2s ease;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            background-color: rgba(156, 163, 175, 0.05);
+            border: 1px solid rgba(156, 163, 175, 0.1);
+        }
+        
+        .toggle-btn:hover {
+            background-color: rgba(156, 163, 175, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .toggle-btn:active {
+            transform: scale(0.95);
+            background-color: rgba(156, 163, 175, 0.3);
+        }
+        
+        /* Dark mode toggle adjustments */
+        .dark .toggle-btn {
+            background-color: rgba(75, 85, 99, 0.1);
+            border-color: rgba(75, 85, 99, 0.2);
+        }
+        
+        .dark .toggle-btn:hover {
+            background-color: rgba(75, 85, 99, 0.3);
+        }
+        
+        .dark .toggle-btn:active {
+            background-color: rgba(75, 85, 99, 0.4);
+        }
+        
+        /* Button click effect */
+        .btn-click-effect {
             position: relative;
             overflow: hidden;
         }
         
-        .btn-ripple::after {
+        .btn-click-effect::after {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             width: 5px;
             height: 5px;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.7);
             opacity: 0;
             border-radius: 100%;
-            transform: scale(1, 1) translate(-50%, -50%);
+            transform: scale(1) translate(-50%, -50%);
             transform-origin: 50% 50%;
         }
         
-        .btn-ripple:focus::after {
-            animation: ripple 1s ease-out;
+        .btn-click-effect:active::after {
+            animation: click-ripple 0.6s ease-out;
         }
         
-        @keyframes ripple {
+        @keyframes click-ripple {
             0% {
-                transform: scale(0, 0);
-                opacity: 0.5;
+                transform: scale(0);
+                opacity: 1;
             }
-            20% {
-                transform: scale(25, 25);
+            40% {
+                transform: scale(20);
                 opacity: 0.5;
             }
             100% {
                 opacity: 0;
-                transform: scale(40, 40);
+                transform: scale(30);
             }
         }
         
@@ -525,6 +605,51 @@
             z-index: 2;
             backdrop-filter: blur(0px); /* Helps with rendering layers correctly */
         }
+        
+        /* Enhanced pulse animation for connection dot */
+        .pulse-dot {
+            animation: pulse-dot 2s infinite;
+        }
+        
+        @keyframes pulse-dot {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Status text styling */
+        .status-text {
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .status-details {
+            font-weight: normal;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Status colors */
+        .status-connected {
+            color: #16a34a; /* green-600 */
+        }
+        
+        .status-checking {
+            color: #f59e0b; /* amber-500 */
+        }
+        
+        .status-error {
+            color: #dc2626; /* red-600 */
+        }
     </style>
     
     <script>
@@ -569,17 +694,21 @@
                 </div>
             <h1 class="text-3xl font-bold text-center text-gray-900 dark:text-white">Blockchain Voting</h1>
             
-            <!-- Theme Toggle Button - Moved to top right corner -->
-            <button id="themeToggle" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                <span class="icon-sun text-yellow-500 dark:hidden">☀️</span>
-                <span class="icon-moon text-blue-300 hidden dark:block">🌙</span>
-            </button>
+            <!-- Theme Toggle Slider - In the top right corner -->
+            <div class="absolute top-4 right-4 flex items-center">
+                <span class="icon-sun text-yellow-500 mr-2 dark:text-gray-400"></span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="themeToggleCheckbox">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="icon-moon text-gray-400 ml-2 dark:text-blue-300"></span>
+            </div>
         </div>
         
-        <!-- Connection Status Indicator - Moved below the title -->
-        <div class="flex items-center justify-center mb-4" id="connectionIndicator">
-            <div class="w-2 h-2 rounded-full bg-yellow-500 mr-2 pulse-animation" id="connectionDot"></div>
-            <span class="text-xs text-gray-600 dark:text-gray-400 font-medium" id="connectionText">Checking connection...</span>
+        <!-- Connection Status Indicator - Modified to remove "(All Systems Online)" text -->
+        <div class="flex items-center justify-center mb-4 py-1 px-2 rounded-full bg-gray-50 dark:bg-gray-800 shadow-sm" id="connectionIndicator">
+            <div class="w-2 h-2 rounded-full bg-yellow-500 mr-2 pulse-animation pulse-dot" id="connectionDot"></div>
+            <span class="text-xs status-text status-checking dark:text-gray-300" id="connectionText">Checking connection...</span>
         </div>
         
         <!-- Authentication Section -->
@@ -618,7 +747,7 @@
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <span class="icon-lock text-gray-500 dark:text-gray-400"></span>
                         </div>
-                        <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400">
+                        <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
                             <span class="icon-eye"></span>
                         </button>
                     </div>
@@ -634,7 +763,7 @@
                                 <span class="icon-wallet text-gray-500 dark:text-gray-400"></span>
                                 <span class="text-sm text-gray-700 dark:text-gray-300">Connect your MetaMask wallet</span>
                             </div>
-                            <button type="button" id="connectWalletBtn" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded" 
+                            <button type="button" id="connectWalletBtn" class="btn-click-effect px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded" 
                                 onclick="connectMetaMask('login')">
                                 Connect
                             </button>
@@ -663,7 +792,7 @@
                 </div>
                 
                 <!-- Submit button -->
-                <button type="button" id="loginButton" class="w-full flex justify-center items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors">
+                <button type="button" id="loginButton" class="btn-click-effect w-full flex justify-center items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors">
                     <span class="icon-sign-in-alt"></span>
                     <span>Login with ID & Wallet</span>
                 </button>
@@ -678,15 +807,6 @@
                 <button id="showRegistrationForm" class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 ml-1" onclick="showRegistrationModal()">
                     Create an account
                 </button>
-            </div>
-            
-            <!-- Link to wallet linking page -->
-            <div class="text-center pt-3 mt-2 border-t border-gray-200 dark:border-gray-700">
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Need to link your National ID to MetaMask?</p>
-                <a href="react-wallet-linking.html" class="inline-flex items-center mt-2 text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium">
-                    <span class="icon-link mr-1"></span>
-                    Link National ID to MetaMask Wallet
-                </a>
             </div>
         </div>
 
@@ -735,7 +855,7 @@
                         <input type="password" id="registerPassword" name="password" required
                             class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
                             placeholder="Create a password">
-                        <button type="button" id="toggleRegisterPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400">
+                        <button type="button" id="toggleRegisterPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
                             <span class="icon-eye"></span>
                         </button>
                     </div>
@@ -782,7 +902,7 @@
                                 <span class="icon-wallet text-gray-500 dark:text-gray-400"></span>
                                 <span class="text-sm text-gray-700 dark:text-gray-300">Connect your MetaMask wallet</span>
                             </div>
-                            <button type="button" id="registerConnectWalletBtn" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded" 
+                            <button type="button" id="registerConnectWalletBtn" class="btn-click-effect px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded" 
                                 onclick="connectMetaMask('register')">
                                 Connect
                             </button>
@@ -812,7 +932,7 @@
                 
                 <!-- Register Button -->
                 <button type="button" id="completeRegistrationBtn"
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-800 transition-colors"
+                    class="btn-click-effect w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-800 transition-colors"
                     onclick="handleRegistrationSubmit()">
                     <span class="icon-user-plus mr-2"></span>
                     Create Account with ID & Wallet
@@ -834,27 +954,40 @@
         // The comprehensive browser polyfill is already added at the top of the document
         console.log('Using comprehensive browser polyfill defined earlier in the page');
         
-        // Fix the theme toggle button
+        // Initialize theme toggle slider
         document.addEventListener('DOMContentLoaded', function() {
-            const themeToggle = document.getElementById('themeToggle');
-            if (themeToggle) {
-                // Get the sun and moon icons
-                const sunIcon = themeToggle.querySelector('.icon-sun');
-                const moonIcon = themeToggle.querySelector('.icon-moon');
+            // Set the initial state of the toggle checkbox based on the current theme
+            const themeToggleCheckbox = document.getElementById('themeToggleCheckbox');
+            if (themeToggleCheckbox) {
+                const isDark = document.documentElement.classList.contains('dark');
+                themeToggleCheckbox.checked = isDark;
                 
-                if (sunIcon && moonIcon) {
-                    // Fix the initial classes
-                    const isDark = document.documentElement.classList.contains('dark');
-                    if (isDark) {
-                        sunIcon.classList.add('hidden');
-                        moonIcon.classList.remove('hidden');
+                // Add the listener right here to avoid duplication
+                themeToggleCheckbox.addEventListener('change', function() {
+                    // Apply theme based on checkbox state
+                    if (this.checked) {
+                        document.documentElement.classList.add('dark');
                     } else {
-                        sunIcon.classList.remove('hidden');
-                        moonIcon.classList.add('hidden');
+                        document.documentElement.classList.remove('dark');
                     }
                     
-                    console.log(`Theme toggle initialized: dark mode = ${isDark}, sunIcon hidden = ${sunIcon.classList.contains('hidden')}, moonIcon hidden = ${moonIcon.classList.contains('hidden')}`);
-                }
+                    // Save preference to localStorage
+                    localStorage.setItem('theme', this.checked ? 'dark' : 'light');
+                    
+                    // Update particles if they exist
+                    if (typeof updateParticlesColors === 'function') {
+                        setTimeout(updateParticlesColors, 100);
+                    }
+                });
+                
+                console.log(`Theme toggle slider initialized: dark mode = ${isDark}`);
+            }
+            
+            // Ensure theme is set from stored preference on page load
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
             }
         });
     </script>
@@ -864,12 +997,201 @@
         // Debug logging
         console.log("Login page loaded at: " + new Date().toISOString());
         
+        // Global variable for storing the current wallet address
+        let currentWalletAddress = null;
+        
+        // Global debug logger function
+        function debugLog(message, data = null) {
+            console.log(message, data);
+            
+            // Optional update to debug panel if it exists
+            const debugPanel = document.getElementById('debugPanel');
+            const debugContent = document.getElementById('debugContent');
+            
+            if (debugPanel && debugContent) {
+                const timestamp = new Date().toLocaleTimeString();
+                let content = `<div class="mb-1"><span class="text-gray-400">${timestamp}</span> ${message}</div>`;
+                
+                if (data) {
+                    if (typeof data === 'object') {
+                        content += `<pre class="text-green-400 text-xs mt-1 mb-2 overflow-x-auto">${JSON.stringify(data, null, 2)}</pre>`;
+                    } else {
+                        content += `<pre class="text-green-400 text-xs mt-1 mb-2">${data}</pre>`;
+                    }
+                }
+                
+                debugContent.innerHTML = content + debugContent.innerHTML;
+            }
+        }
+        
+        // Process login function
+        function processLogin(nationalId, password, rememberMe) {
+            debugLog('Processing login', { nationalId, rememberMe });
+            
+            // Validate inputs
+            if (!nationalId || !password) {
+                showFeedback(document.getElementById('loginFeedback'), 'Please fill in all fields', true);
+                return;
+            }
+            
+            // Show loading state on button
+            const loginButton = document.getElementById('loginButton');
+            if (loginButton) {
+                loginButton.disabled = true;
+                loginButton.innerHTML = '<span class="loader"></span> Logging in...';
+            }
+            
+            // Check if wallet is connected
+            const walletConnected = document.getElementById('walletConnected');
+            if (!walletConnected || walletConnected.classList.contains('hidden')) {
+                showFeedback(document.getElementById('loginFeedback'), 'Please connect your MetaMask wallet first', true);
+                // Reset button state
+                if (loginButton) {
+                    loginButton.disabled = false;
+                    loginButton.innerHTML = 'Login with ID & Wallet';
+                }
+                return;
+            }
+            
+            // Perform actual API-based authentication
+            fetch('http://localhost:8000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nationalId: nationalId,
+                    password: password,
+                    walletAddress: currentWalletAddress || ''
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Authentication succeeded
+                    debugLog('Login successful', data);
+                    
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('nationalId', nationalId);
+                    localStorage.setItem('voterId', nationalId);
+                    localStorage.setItem('walletAddress', currentWalletAddress || '');
+                    localStorage.setItem('role', data.user.role);
+                    localStorage.setItem('isAuthenticated', 'true');
+                    localStorage.setItem('lastLogin', new Date().toISOString());
+                    
+                    // Store nationalId for Remember Me
+                    if (rememberMe) {
+                        const expiryDate = new Date();
+                        expiryDate.setDate(expiryDate.getDate() + 30);
+                        localStorage.setItem('rememberedNationalId', nationalId);
+                        localStorage.setItem('rememberMeExpires', expiryDate.getTime());
+                    } else {
+                        localStorage.removeItem('rememberedNationalId');
+                        localStorage.removeItem('rememberMeExpires');
+                    }
+                    
+                    // Show success message
+                    showFeedback(document.getElementById('loginFeedback'), 'Login successful. Redirecting...', false);
+                    
+                    // Reset button state
+                    if (loginButton) {
+                        loginButton.disabled = false;
+                        loginButton.innerHTML = 'Login with ID & Wallet';
+                    }
+                    
+                    // Clear any redirect counters
+                    sessionStorage.removeItem('redirectCounter');
+                    
+                    // Redirect based on role
+                    setTimeout(() => {
+                        const role = data.user.role;
+                        if (role === 'admin') {
+                            window.location.href = 'admin.html?from=login&time=' + Date.now();
+                        } else {
+                            window.location.href = 'index.html?from=login&time=' + Date.now();
+                        }
+                    }, 1000);
+                } else {
+                    // Login failed
+                    debugLog('Login failed', data);
+                    showFeedback(document.getElementById('loginFeedback'), data.message || 'Invalid credentials', true);
+                    
+                    // Reset button state
+                    if (loginButton) {
+                        loginButton.disabled = false;
+                        loginButton.innerHTML = 'Login with ID & Wallet';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error during login:', error);
+                debugLog('Login error', error.message);
+                
+                // Show error message
+                showFeedback(document.getElementById('loginFeedback'), 'Server connection error. Please try again later.', true);
+                
+                // Reset button state
+                if (loginButton) {
+                    loginButton.disabled = false;
+                    loginButton.innerHTML = 'Login with ID & Wallet';
+                }
+            });
+        }
+        
+        // Function to show feedback message (global)
+        function showFeedback(element, message, isError = false) {
+            if (!element) return;
+            
+            element.textContent = message;
+            element.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'dark:bg-green-800', 'dark:text-green-100', 'dark:bg-red-800', 'dark:text-red-100');
+            
+            if (isError) {
+                element.classList.add('bg-red-100', 'text-red-800', 'dark:bg-red-800', 'dark:text-red-100');
+            } else {
+                element.classList.add('bg-green-100', 'text-green-800', 'dark:bg-green-800', 'dark:text-green-100');
+            }
+            
+            debugLog(isError ? `Error: ${message}` : `Success: ${message}`);
+        }
+        
+        // Set loading state on button (global)
+        function setLoading(button, isLoading) {
+            if (!button) return;
+            
+            if (isLoading) {
+                button._originalHTML = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<div class="loader"></div><span>Processing...</span>';
+            } else {
+                button.disabled = false;
+                button.innerHTML = button._originalHTML || 'Submit';
+            }
+        }
+        
+        // Helper function to format wallet address
+        function formatWalletAddress(address) {
+            if (!address) return '';
+            return address.slice(0, 6) + '...' + address.slice(-4);
+        }
+        
         // NO AUTOMATIC REDIRECTS FROM LOGIN PAGE
         // We prevent all redirects from login page to avoid redirect loops 
         
         // If user is already authenticated, show a message but don't redirect
         document.addEventListener('DOMContentLoaded', function() {
             console.log("Login page DOM loaded");
+            
+            // Initialize password toggle button titles
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const toggleRegisterPasswordBtn = document.getElementById('toggleRegisterPassword');
+            
+            if (togglePasswordBtn) {
+                togglePasswordBtn.setAttribute('title', 'Show password');
+            }
+            
+            if (toggleRegisterPasswordBtn) {
+                toggleRegisterPasswordBtn.setAttribute('title', 'Show password');
+            }
             
             // Check URL parameters for feedback messages
             const urlParams = new URLSearchParams(window.location.search);
@@ -996,7 +1318,7 @@
                     // Reset button state
                     if (loginButton) {
                         loginButton.disabled = false;
-                        loginButton.innerHTML = 'Login';
+                        loginButton.innerHTML = 'Login with ID & Wallet';
                     }
                 }
             })
@@ -1009,7 +1331,7 @@
                 // Reset button state
                 if (loginButton) {
                     loginButton.disabled = false;
-                    loginButton.innerHTML = 'Login';
+                    loginButton.innerHTML = 'Login with ID & Wallet';
                 }
             });
         });
@@ -1144,42 +1466,7 @@
         
         // Direct implementation of login functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Debug logger function
-            function debugLog(message, data = null) {
-                const debugPanel = document.getElementById('debugPanel');
-                const debugContent = document.getElementById('debugContent');
-                if (!debugPanel || !debugContent) return;
-                
-                const timestamp = new Date().toLocaleTimeString();
-                let content = `<div class="mb-1"><span class="text-gray-400">${timestamp}</span> ${message}</div>`;
-                
-                if (data) {
-                    if (typeof data === 'object') {
-                        content += `<pre class="text-green-400 text-xs mt-1 mb-2 overflow-x-auto">${JSON.stringify(data, null, 2)}</pre>`;
-                    } else {
-                        content += `<pre class="text-green-400 text-xs mt-1 mb-2">${data}</pre>`;
-                    }
-                }
-                
-                debugContent.innerHTML = content + debugContent.innerHTML;
-                console.log(message, data);
-            }
-
-            // Show feedback message
-            function showFeedback(element, message, isError = false) {
-                if (!element) return;
-                
-                element.textContent = message;
-                element.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'dark:bg-green-800', 'dark:text-green-100', 'dark:bg-red-800', 'dark:text-red-100');
-                
-                if (isError) {
-                    element.classList.add('bg-red-100', 'text-red-800', 'dark:bg-red-800', 'dark:text-red-100');
-                } else {
-                    element.classList.add('bg-green-100', 'text-green-800', 'dark:bg-green-800', 'dark:text-green-100');
-                }
-                
-                debugLog(isError ? `Error: ${message}` : `Success: ${message}`);
-            }
+            // Debug logger function and showFeedback are now defined globally
             
             // Show debug panel
             document.addEventListener('keydown', function(event) {
@@ -1190,6 +1477,15 @@
                         debugPanel.classList.toggle('hidden');
                     }
                 }
+            });
+            
+            // Announce that password visibility toggle is functioning
+            console.log('%c🔒 Password visibility toggle is running! ', 'background: #16a34a; color: white; padding: 4px; border-radius: 4px;');
+            debugLog('Password visibility toggle feature initialized', {
+                status: 'running',
+                fallbackEnabled: true,
+                browserCompatibility: 'enhanced',
+                version: '1.2.0'
             });
             
             // Close debug panel
@@ -1403,24 +1699,108 @@
            const loginButton = document.getElementById('loginButton');
             if (loginButton) {
                 loginButton.addEventListener('click', function() {
-                    console.log('Login button clicked via event listener');
+                    debugLog('Login button clicked');
                    const nationalId = document.getElementById('nationalId').value;
                     const password = document.getElementById('password').value;
                     const rememberMe = document.getElementById('rememberMe').checked;
                     
-                    // Use the existing processLogin function
+                    // Use the processLogin function
                     processLogin(nationalId, password, rememberMe);
                });
            }
            
            // Toggle password visibility handlers
            const togglePassword = document.getElementById('togglePassword');
-           const passwordInput = document.getElementById('password');
+           let passwordInput = document.getElementById('password');
            if (togglePassword && passwordInput) {
-               togglePassword.addEventListener('click', function() {
-                   const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                   passwordInput.setAttribute('type', type);
-                   debugLog('Password visibility toggled');
+               togglePassword.addEventListener('click', function(e) {
+                   e.preventDefault(); // Prevent any default button behavior
+                   
+                   try {
+                       console.log('Password visibility toggle clicked');
+                       debugLog('Password toggle button clicked', { field: 'login' });
+                       
+                       // Get current type and value
+                       const currentType = passwordInput.getAttribute('type') || 'password';
+                       const currentValue = passwordInput.value;
+                       const cursorPosition = passwordInput.selectionStart;
+                       
+                       // Determine new type (toggle between password and text)
+                       const newType = currentType === 'password' ? 'text' : 'password';
+                       
+                       // Set type both ways for maximum compatibility
+                       passwordInput.setAttribute('type', newType);
+                       passwordInput.type = newType;
+                       
+                       // Log updated type for debugging
+                       console.log(`Password type changed to: ${passwordInput.type} (should be ${newType})`);
+                       debugLog('Attempted direct type change', { from: currentType, to: newType, result: passwordInput.type });
+                       
+                       // Add visual feedback
+                       this.classList.add('scale-110');
+                       setTimeout(() => this.classList.remove('scale-110'), 200);
+                       
+                       // Toggle the icon immediately for fast visual feedback
+                       const iconElement = this.querySelector('span');
+                       
+                       if (newType === 'text') {
+                           // Password is now visible, show the "hide" icon
+                           iconElement.classList.remove('icon-eye');
+                           iconElement.classList.add('icon-eye-slash');
+                           this.setAttribute('title', 'Hide password');
+                       } else {
+                           // Password is now hidden, show the "show" icon
+                           iconElement.classList.remove('icon-eye-slash');
+                           iconElement.classList.add('icon-eye');
+                           this.setAttribute('title', 'Show password');
+                       }
+                       
+                       // Check if the type change worked, if not use fallback
+                       if (passwordInput.type !== newType) {
+                           console.log('Using fallback for password toggle');
+                           debugLog('Direct type change failed, using fallback method', { expected: newType, actual: passwordInput.type });
+                           
+                           // Create a new input element
+                           const newInput = document.createElement('input');
+                           newInput.id = 'password';
+                           newInput.name = 'password';
+                           newInput.className = passwordInput.className;
+                           newInput.value = currentValue;
+                           newInput.type = newType;
+                           
+                           // Replace the old input with the new one
+                           passwordInput.parentNode.replaceChild(newInput, passwordInput);
+                           
+                           // Update our reference to the new input
+                           passwordInput = newInput;
+                           
+                           // Try to restore focus and cursor position
+                           setTimeout(() => {
+                               passwordInput.focus();
+                               if (passwordInput.setSelectionRange && cursorPosition !== null) {
+                                   passwordInput.setSelectionRange(cursorPosition, cursorPosition);
+                               }
+                               
+                               // Log the result of the fallback approach
+                               console.log(`Password visibility toggle fallback result: type=${passwordInput.type}, expected=${newType}`);
+                               debugLog('Password visibility toggle fallback completed', { 
+                                   field: 'login', 
+                                   resultType: passwordInput.type,
+                                   expectedType: newType,
+                                   successful: passwordInput.type === newType 
+                               });
+                           }, 10);
+                       } else {
+                           debugLog('Password visibility toggled successfully with direct method', { 
+                               field: 'login', 
+                               newType,
+                               method: 'direct' 
+                           });
+                       }
+                   } catch (error) {
+                       console.error('Error toggling password visibility:', error);
+                       debugLog('Error toggling password visibility', error.message);
+                   }
                });
            }
            
@@ -1451,7 +1831,7 @@
            let registrationModal = document.getElementById('registrationModal');
            const closeRegistrationModal = document.getElementById('closeRegistrationModal');
            const showRegistrationForm = document.getElementById('showRegistrationForm');
-           const registerPasswordInput = document.getElementById('registerPassword');
+           let registerPasswordInput = document.getElementById('registerPassword');
            
            if (showRegistrationForm && registrationModal) {
                showRegistrationForm.addEventListener('click', function() {
@@ -1482,6 +1862,109 @@
            if (registerPasswordInput) {
                registerPasswordInput.addEventListener('input', function() {
                    updatePasswordStrength(this.value, 'registerPassword');
+               });
+           }
+           
+           // Add the registration password toggle event listener
+           const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+           if (toggleRegisterPassword && registerPasswordInput) {
+               toggleRegisterPassword.addEventListener('click', function(e) {
+                   e.preventDefault(); // Prevent any default button behavior
+                   
+                   try {
+                       console.log('Register password visibility toggle clicked');
+                       debugLog('Register password toggle button clicked', { field: 'register' });
+                       
+                       // Get current type and value
+                       const currentType = registerPasswordInput.getAttribute('type') || 'password';
+                       const currentValue = registerPasswordInput.value;
+                       const cursorPosition = registerPasswordInput.selectionStart;
+                       
+                       // Determine new type (toggle between password and text)
+                       const newType = currentType === 'password' ? 'text' : 'password';
+                       
+                       // Set type both ways for maximum compatibility
+                       registerPasswordInput.setAttribute('type', newType);
+                       registerPasswordInput.type = newType;
+                       
+                       // Log updated type for debugging
+                       console.log(`Register password type changed to: ${registerPasswordInput.type} (should be ${newType})`);
+                       debugLog('Attempted direct type change for register password', { from: currentType, to: newType, result: registerPasswordInput.type });
+                       
+                       // Add visual feedback
+                       this.classList.add('scale-110');
+                       setTimeout(() => this.classList.remove('scale-110'), 200);
+                       
+                       // Toggle the icon immediately for fast visual feedback
+                       const iconElement = this.querySelector('span');
+                       
+                       if (newType === 'text') {
+                           // Password is now visible, show the "hide" icon
+                           iconElement.classList.remove('icon-eye');
+                           iconElement.classList.add('icon-eye-slash');
+                           this.setAttribute('title', 'Hide password');
+                       } else {
+                           // Password is now hidden, show the "show" icon
+                           iconElement.classList.remove('icon-eye-slash');
+                           iconElement.classList.add('icon-eye');
+                           this.setAttribute('title', 'Show password');
+                       }
+                       
+                       // Check if the type change worked, if not use fallback
+                       if (registerPasswordInput.type !== newType) {
+                           console.log('Using fallback for register password toggle');
+                           debugLog('Direct type change failed for register password, using fallback method', { expected: newType, actual: registerPasswordInput.type });
+                           
+                           // Create a new input element with the desired properties
+                           const newInput = document.createElement('input');
+                           newInput.id = 'registerPassword';
+                           newInput.name = 'password';
+                           newInput.className = registerPasswordInput.className;
+                           newInput.required = true; 
+                           newInput.placeholder = 'Create a password';
+                           newInput.value = currentValue;
+                           newInput.type = newType;
+                           
+                           // Replace the old input
+                           registerPasswordInput.parentNode.replaceChild(newInput, registerPasswordInput);
+                           
+                           // Update our reference to the new input
+                           registerPasswordInput = newInput;
+                           
+                           // Re-add the input event listener for password strength
+                           registerPasswordInput.addEventListener('input', function() {
+                               updatePasswordStrength(this.value, 'registerPassword');
+                           });
+                           
+                           // Try to restore focus and cursor position
+                           setTimeout(() => {
+                               registerPasswordInput.focus();
+                               if (registerPasswordInput.setSelectionRange && cursorPosition !== null) {
+                                   registerPasswordInput.setSelectionRange(cursorPosition, cursorPosition);
+                               }
+                               
+                               // Log the result of the fallback approach
+                               console.log(`Register password visibility toggle fallback result: type=${registerPasswordInput.type}, expected=${newType}`);
+                               debugLog('Register password visibility toggle fallback completed', { 
+                                   field: 'register', 
+                                   resultType: registerPasswordInput.type,
+                                   expectedType: newType,
+                                   successful: registerPasswordInput.type === newType 
+                               });
+                           }, 10);
+                       } else {
+                           debugLog('Register password visibility toggled successfully with direct method', { 
+                               field: 'register', 
+                               newType,
+                               method: 'direct' 
+                           });
+                       }
+                       
+                       debugLog('Register password visibility toggle process complete', { success: true });
+                   } catch (error) {
+                       console.error('Error toggling register password visibility:', error);
+                       debugLog('Error toggling register password visibility', error.message);
+                   }
                });
            }
            
@@ -1674,311 +2157,83 @@
             // Update connection indicator
             const connectionDot = document.getElementById('connectionDot');
             const connectionText = document.getElementById('connectionText');
+            const connectionDetails = document.getElementById('connectionDetails');
+            const connectionIndicator = document.getElementById('connectionIndicator');
            
            function updateConnectionStatus() {
+            // Check if network is available
             if (navigator.onLine) {
+                // Update dot color and animation
                 connectionDot.classList.remove('bg-yellow-500', 'bg-red-500');
-                connectionDot.classList.add('bg-green-500');
-                connectionText.textContent = 'Online';
-            } else {
-                connectionDot.classList.remove('bg-yellow-500', 'bg-green-500');
-                connectionDot.classList.add('bg-red-500');
-                connectionText.textContent = 'Offline';
-               }
-            }
-           
-           // Initial connection status check
-           updateConnectionStatus();
-            
-            // Listen for online/offline events
-           window.addEventListener('online', updateConnectionStatus);
-           window.addEventListener('offline', updateConnectionStatus);
-           
-           // Initialize - check if wallet is already connected
-           checkWalletConnection();
-           
-           // Function to toggle theme
-           function toggleTheme() {
-               document.documentElement.classList.toggle('dark');
-               
-               // Save preference to localStorage
-               const isDarkMode = document.documentElement.classList.contains('dark');
-               localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-           }
-           
-           // Add event listener to theme toggle button
-           const themeToggle = document.getElementById('themeToggle');
-           if (themeToggle) {
-               themeToggle.addEventListener('click', toggleTheme);
-           }
-           
-           // Debug log initialization
-           debugLog('Login page initialized');
-           
-           // Set initial theme based on preference
-           if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-               document.documentElement.classList.add('dark');
-           } else {
-               document.documentElement.classList.remove('dark');
-           }
-           
-           // Track wallet connection
-           let currentWalletAddress = '';
-           
-           // Function to show registration modal
-           function showRegistrationModal() {
-               const modal = registrationModal; // Use the existing variable instead of declaring a new one
-               if (modal) {
-                   modal.classList.remove('hidden');
-                   debugLog('Registration modal opened');
-               }
-           }
-           
-           // Function to hide registration modal
-           function hideRegistrationModal() {
-               const modal = registrationModal; // Use the existing variable instead of declaring a new one
-               if (modal) {
-                   modal.classList.add('hidden');
-                   debugLog('Registration modal closed');
-               }
-           }
-           
-           // Function to handle registration submission
-           function handleRegistrationSubmit() {
-               const registerNationalId = document.getElementById('registerNationalId');
-               const registerPassword = document.getElementById('registerPassword');
-               const acceptTerms = document.getElementById('acceptTerms');
-               const registerFeedback = document.getElementById('registerFeedback');
-               
-               if (!registerNationalId || !registerPassword || !acceptTerms || !registerFeedback) {
-                   console.error('Required registration elements not found');
-                   return;
-               }
-               
-               const nationalId = registerNationalId.value;
-               const password = registerPassword.value;
-               const termsAccepted = acceptTerms.checked;
+                connectionDot.classList.add('bg-green-500', 'pulse-dot');
                 
-               // Validate inputs
-               if (!nationalId || !password) {
-                   showFeedback(registerFeedback, 'Please fill in all fields', true);
-                   return;
-               }
-               
-               if (!termsAccepted) {
-                   showFeedback(registerFeedback, 'Please accept the Terms of Service', true);
-                   return;
-               }
-               
-               // Check if wallet is connected
-               if (!currentWalletAddress) {
-                   showFeedback(registerFeedback, 'Please connect your MetaMask wallet to continue', true);
-                   return;
-               }
-               
-               // Validate password strength
-               const score = updatePasswordStrength(password, 'registerPassword');
-               if (score < 3) {
-                   showFeedback(registerFeedback, 'Please use a stronger password', true);
-                   return;
-               }
-               
-               const completeRegistrationBtn = document.getElementById('completeRegistrationBtn');
-               // Set loading state
-               setLoading(completeRegistrationBtn, true);
-               
-               // Call our database API to register the user
-               fetch('http://localhost:8000/api/register', {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'application/json'
-                   },
-                   body: JSON.stringify({
-                       nationalId: nationalId,
-                       password: password,
-                       walletAddress: currentWalletAddress
-                   })
-               })
-               .then(response => response.json())
-               .then(data => {
-                   if (data.success) {
-                       // Registration successful
-                       showFeedback(registerFeedback, 'Account created and wallet linked successfully!', false);
-                       
-                       // Auto-fill login form after successful registration
-                       const loginNationalId = document.getElementById('nationalId');
-                       if (loginNationalId) {
-                           loginNationalId.value = nationalId;
-                       }
-                       
-                       // Close modal after a delay
-                       setTimeout(() => {
-                           hideRegistrationModal();
-                       }, 2000);
-                   } else {
-                       // Registration failed
-                       showFeedback(registerFeedback, data.message || 'Registration failed', true);
-                   }
-               })
-               .catch(error => {
-                   console.error('Error registering user:', error);
-                   
-                   // Fallback for demo purposes when the API isn't running
-                   if (!window.location.hostname.includes('localhost')) {
-                       // Simulate successful registration
-                       showFeedback(registerFeedback, 'Account created and wallet linked successfully! (Demo mode)', false);
-                       
-                       // Auto-fill login form after successful registration
-                       const loginNationalId = document.getElementById('nationalId');
-                       if (loginNationalId) {
-                           loginNationalId.value = nationalId;
-                       }
-                       
-                       // Close modal after a delay
-                       setTimeout(() => {
-                           hideRegistrationModal();
-                       }, 2000);
-                   } else {
-                       showFeedback(registerFeedback, 'Connection error. Please make sure the Database API is running.', true);
-                   }
-               })
-               .finally(() => {
-                   setLoading(completeRegistrationBtn, false);
-               });
-           }
+                // Update text and styling
+                connectionText.textContent = 'All systems connected';
+                connectionText.classList.remove('status-checking', 'status-error');
+                connectionText.classList.add('status-connected');
+                
+                // Update indicator background for connected state
+                connectionIndicator.classList.add('border-green-100');
+                connectionIndicator.classList.remove('border-red-100');
+                
+                // Show online status details
+                if (connectionDetails) {
+                    connectionDetails.classList.remove('hidden');
+                    connectionDetails.textContent = '(All Systems Online)';
+                    connectionDetails.classList.add('status-connected');
+                }
+                
+                // Log connection status
+                debugLog('Connection status', { 
+                    status: 'connected', 
+                    online: true, 
+                    systemsOnline: true,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                // Update dot for offline state
+                connectionDot.classList.remove('bg-yellow-500', 'bg-green-500', 'pulse-dot');
+                connectionDot.classList.add('bg-red-500');
+                
+                // Update text for offline state
+                connectionText.textContent = 'Offline';
+                connectionText.classList.remove('status-checking', 'status-connected');
+                connectionText.classList.add('status-error');
+                
+                // Update indicator background for error state
+                connectionIndicator.classList.remove('border-green-100');
+                connectionIndicator.classList.add('border-red-100');
+                
+                // Hide details when offline
+                if (connectionDetails) {
+                    connectionDetails.classList.add('hidden');
+                    connectionDetails.classList.remove('status-connected');
+                }
+                
+                // Log disconnection
+                debugLog('Connection status', { 
+                    status: 'disconnected', 
+                    online: false,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
            
-           // Function to process login
-           function processLogin(nationalId, password, rememberMe) {
-               console.log(`Login attempt for: ${nationalId}, password length: ${password.length}, remember me: ${rememberMe}, wallet connected: ${currentWalletAddress ? 'Yes' : 'No'}`);
+           // Check connection status when page loads
+           document.addEventListener('DOMContentLoaded', function() {
+               // Initial connection status check
+               updateConnectionStatus();
                
-               // Validate inputs
-               if (!nationalId || !password) {
-                   showFeedback(document.getElementById('loginFeedback'), 'Please fill in all fields', true);
-                   return;
-               }
+               // Test connection status every 30 seconds
+               setInterval(updateConnectionStatus, 30000);
                
-               if (!currentWalletAddress) {
-                   showFeedback(document.getElementById('loginFeedback'), 'Please connect your MetaMask wallet first', true);
-                   return;
-               }
+               // Also update status when online/offline events occur
+               window.addEventListener('online', updateConnectionStatus);
+               window.addEventListener('offline', updateConnectionStatus);
                
-               // Set loading state
-               const loginButton = document.getElementById('loginButton');
-               const loginFeedback = document.getElementById('loginFeedback');
-               setLoading(loginButton, true);
-               
-               try {
-                   // Make API request to login endpoint
-                   console.log(`Making login request with: ${nationalId}, wallet: ${currentWalletAddress}`);
-                   fetch('http://localhost:8000/api/login', {
-                       method: 'POST',
-                       headers: {
-                           'Content-Type': 'application/json'
-                       },
-                       body: JSON.stringify({
-                           nationalId,
-                           password,
-                           walletAddress: currentWalletAddress
-                       })
-                   })
-                   .then(response => {
-                       if (!response.ok) {
-                           throw new Error(`API request failed with status ${response.status}`);
-                       }
-                       return response.json();
-                   })
-                   .then(data => {
-                       if (data.success) {
-                           // Login successful
-                           debugLog('Login successful', data);
-                           
-                           // Store auth data in localStorage
-                           localStorage.setItem('token', data.token);
-                           localStorage.setItem('nationalId', nationalId);
-                           localStorage.setItem('voterId', nationalId);
-                           localStorage.setItem('walletAddress', currentWalletAddress || data.user.walletAddress);
-                           localStorage.setItem('role', data.user.role);
-                           localStorage.setItem('isAuthenticated', 'true');
-                           localStorage.setItem('login_timestamp', Date.now().toString());
-                           
-                           // Store user info if provided
-                           if (data.user) {
-                               localStorage.setItem('user_id', data.user.id);
-                               localStorage.setItem('user_role', data.user.role);
-                           }
-                           
-                           if (rememberMe) {
-                               localStorage.setItem('rememberedNationalId', nationalId);
-                               // Set expiration for 30 days
-                               const expires = new Date();
-                               expires.setDate(expires.getDate() + 30);
-                               localStorage.setItem('rememberMeExpires', expires.getTime());
-                           }
-                           
-                           // Show success message
-                           showFeedback(loginFeedback, 'Login successful! Redirecting...', false);
-                           
-                           // Reset redirect counter
-                           sessionStorage.removeItem('redirectCounter');
-                           
-                           // Redirect to the appropriate page with auth timestamp
-                           setTimeout(() => {
-                               // Add a timestamp to prevent caching issues
-                               const timestamp = Date.now();
-                               console.log("Redirecting after successful login");
-                               window.location.href = (data.user.role === 'admin' ? 'admin.html' : 'index.html') + 
-                                   '?auth=' + timestamp;
-                           }, 1000);
-                       } else {
-                           // Login failed
-                           showFeedback(loginFeedback, data.message || 'Login failed', true);
-                           setLoading(loginButton, false);
-                       }
-                   })
-                   .catch(error => {
-                       console.error('Error during login:', error);
-                       
-                       // Show error message
-                       showFeedback(loginFeedback, 
-                           'Unable to connect to authentication service. Please try again later.', 
-                           true);
-                       
-                       // Reset login button
-                       setLoading(loginButton, false);
-                   });
-               } catch (error) {
-                   console.error('Login error:', error);
-                   showFeedback(loginFeedback, `Error: ${error.message}`, true);
-                   setLoading(loginButton, false);
-               }
-           }
-           
-           // Toggle password visibility for registration
-           const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
-           if (toggleRegisterPassword && registerPasswordInput) {
-               toggleRegisterPassword.addEventListener('click', () => {
-                   const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                   registerPasswordInput.setAttribute('type', type);
-                   debugLog('Register password visibility toggled');
-               });
-           }
-           
-           // Add password input event for registration
-           if (registerPasswordInput) {
-               registerPasswordInput.addEventListener('input', function() {
-                   updatePasswordStrength(this.value, 'registerPassword');
-               });
-           }
-           
-           // Close registration modal when clicking outside
-           const modal = document.getElementById('registrationModal');
-           if (modal) {
-               modal.addEventListener('click', function(e) {
-                   if (e.target === this) {
-                       hideRegistrationModal();
-                   }
-               });
-           }
+               // Initialize - check if wallet is already connected
+               checkWalletConnection();
+           });
         });
     </script>
     
@@ -2124,14 +2379,6 @@
                   
                   // Set up theme-based color changing
                   updateParticlesColors();
-                  
-                  // Listen for theme changes
-                  const themeToggle = document.getElementById('themeToggle');
-                  if (themeToggle) {
-                      themeToggle.addEventListener('click', function() {
-                          setTimeout(updateParticlesColors, 100); // Small delay to ensure theme has changed
-                      });
-                  }
               }
           } catch (error) {
               console.error("Error initializing Particles.js:", error);
@@ -2183,6 +2430,62 @@
               initParticles();
           }
       });
+    </script>
+    
+    <!-- Add a simpler, more direct password toggle function -->
+    <script>
+    function togglePasswordVisibility(inputId) {
+        console.log('Toggling password visibility for: ' + inputId);
+        const passwordInput = document.getElementById(inputId);
+        const toggleBtn = document.getElementById('toggle' + (inputId === 'password' ? 'Password' : 'RegisterPassword'));
+        
+        if (!passwordInput || !toggleBtn) {
+            console.error('Password input or toggle button not found');
+            return;
+        }
+        
+        // Determine new type (toggle between password and text)
+        const isPassword = passwordInput.type === 'password';
+        const newType = isPassword ? 'text' : 'password';
+        
+        // Simple direct approach - change the type
+        passwordInput.type = newType;
+        
+        // Update the icon
+        const icon = toggleBtn.querySelector('span');
+        if (icon) {
+            if (newType === 'text') {
+                // Show the hide icon
+                icon.className = 'icon-eye-slash';
+            } else {
+                // Show the show icon
+                icon.className = 'icon-eye';
+            }
+        }
+        
+        console.log('Password visibility toggled to: ' + newType);
+    }
+
+    // Add event listeners for the password toggle buttons when the document is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener for the login password toggle button
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        if (togglePasswordBtn) {
+            togglePasswordBtn.addEventListener('click', function() {
+                togglePasswordVisibility('password');
+            });
+        }
+        
+        // Add event listener for the registration password toggle button
+        const toggleRegisterPasswordBtn = document.getElementById('toggleRegisterPassword');
+        if (toggleRegisterPasswordBtn) {
+            toggleRegisterPasswordBtn.addEventListener('click', function() {
+                togglePasswordVisibility('registerPassword');
+            });
+        }
+        
+        console.log('Password visibility toggle listeners initialized');
+    });
     </script>
 </body>
 </html>

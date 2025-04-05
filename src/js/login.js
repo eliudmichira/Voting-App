@@ -214,19 +214,40 @@ class UIService {
   }
   
   static togglePasswordVisibility(inputId, toggleBtnId) {
+    console.log(`Toggling password visibility for ${inputId}`);
     const passwordInput = document.getElementById(inputId);
     const toggleBtn = document.getElementById(toggleBtnId);
     
-    if (!passwordInput || !toggleBtn) return;
-    
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    
-    // Update icon
-    const icon = toggleBtn.querySelector('i');
-    if (icon) {
-      icon.className = type === 'password' ? 'ri-eye-line' : 'ri-eye-off-line';
+    if (!passwordInput || !toggleBtn) {
+        console.error(`Could not find elements: input=${!!passwordInput}, button=${!!toggleBtn}`);
+        return;
     }
+    
+    // Simple direct approach - determine the new type and change
+    const isPassword = passwordInput.type === 'password';
+    const newType = isPassword ? 'text' : 'password';
+    
+    // Directly set the type
+    passwordInput.type = newType;
+    
+    // Update the icon
+    const icon = toggleBtn.querySelector('span');
+    if (icon) {
+        if (newType === 'text') {
+            // Password is now visible, show the "hide" icon
+            icon.className = 'icon-eye-slash';
+        } else {
+            // Password is now hidden, show the "show" icon
+            icon.className = 'icon-eye';
+        }
+    }
+    
+    // Add visual feedback
+    toggleBtn.classList.add('scale-110');
+    setTimeout(() => toggleBtn.classList.remove('scale-110'), 200);
+    
+    console.log(`Password visibility successfully toggled to ${newType}`);
+    return true;
   }
 }
 
@@ -709,29 +730,75 @@ class LoginManager {
   async updateConnectionStatus() {
     const connectionDot = document.getElementById('connectionDot');
     const connectionText = document.getElementById('connectionText');
+    const connectionIndicator = document.getElementById('connectionIndicator');
     
     if (!connectionDot || !connectionText) return;
     
-    connectionDot.className = 'w-2 h-2 rounded-full bg-yellow-500 mr-2 pulse';
+    // Update to checking state
+    connectionDot.className = 'w-2 h-2 rounded-full bg-yellow-500 mr-2 pulse-animation pulse-dot';
     connectionText.textContent = 'Testing connection...';
-    connectionText.className = 'text-xs text-gray-600 dark:text-gray-400';
+    connectionText.className = 'text-xs status-text status-checking dark:text-gray-300';
+    
+    if (connectionIndicator) {
+        connectionIndicator.classList.remove('border-green-100', 'border-red-100');
+    }
     
     try {
-      const result = await this.apiService.testConnection();
-      
-      if (result.success) {
-        connectionDot.className = 'w-2 h-2 rounded-full bg-green-500 mr-2';
-        connectionText.textContent = `Connected (${result.type})`;
-        connectionText.className = 'text-xs text-green-600 dark:text-green-400';
-      } else {
+        const result = await this.apiService.testConnection();
+        
+        if (result.success) {
+            // Update to connected state
+            connectionDot.className = 'w-2 h-2 rounded-full bg-green-500 mr-2 pulse-dot';
+            connectionText.textContent = 'All systems connected';
+            connectionText.className = 'text-xs status-text status-connected dark:text-green-400';
+            
+            // Update indicator background
+            if (connectionIndicator) {
+                connectionIndicator.classList.add('border-green-100');
+                connectionIndicator.classList.remove('border-red-100');
+            }
+            
+            // Log success
+            DebugService.log("Connection test successful", { 
+                type: result.type,
+                systemsOnline: true,
+                timestamp: new Date().toISOString()
+            });
+        } else {
+            // Update to error state
+            connectionDot.className = 'w-2 h-2 rounded-full bg-red-500 mr-2';
+            connectionText.textContent = 'Connection failed';
+            connectionText.className = 'text-xs status-text status-error dark:text-red-400';
+            
+            // Update indicator background
+            if (connectionIndicator) {
+                connectionIndicator.classList.remove('border-green-100');
+                connectionIndicator.classList.add('border-red-100');
+            }
+            
+            // Log failure
+            DebugService.log("Connection test failed", { 
+                error: "API endpoint unreachable",
+                timestamp: new Date().toISOString()
+            });
+        }
+    } catch (error) {
+        // Update to error state
         connectionDot.className = 'w-2 h-2 rounded-full bg-red-500 mr-2';
-        connectionText.textContent = 'Connection failed';
-        connectionText.className = 'text-xs text-red-600 dark:text-red-400';
-      }
-        } catch (error) {
-      connectionDot.className = 'w-2 h-2 rounded-full bg-red-500 mr-2';
-      connectionText.textContent = 'Connection error';
-      connectionText.className = 'text-xs text-red-600 dark:text-red-400';
+        connectionText.textContent = 'Connection error';
+        connectionText.className = 'text-xs status-text status-error dark:text-red-400';
+        
+        // Update indicator background
+        if (connectionIndicator) {
+            connectionIndicator.classList.remove('border-green-100');
+            connectionIndicator.classList.add('border-red-100');
+        }
+        
+        // Log error
+        DebugService.log("Connection test error", { 
+            error: error.message,
+            timestamp: new Date().toISOString()
+        });
     }
   }
   
@@ -1621,29 +1688,19 @@ function updateParticlesThemeCustom() {
 
 // Function to toggle password visibility
 function togglePasswordVisibility(inputId, toggleBtnId) {
-  console.log("Password visibility toggled", loginManagerInstance);
-  const passwordInput = document.getElementById(inputId);
-  const toggleBtn = document.getElementById(toggleBtnId);
-  
-  if (!passwordInput || !toggleBtn) return;
-  
-  const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-  passwordInput.setAttribute('type', type);
-  
-  // Update icon
-  const icon = toggleBtn.querySelector('i');
-  if (icon) {
-    icon.className = type === 'password' ? 'ri-eye-line' : 'ri-eye-off-line';
-  }
+    console.log(`Global password toggle for: ${inputId}`);
+    
+    // Use the improved UIService version
+    return UIService.togglePasswordVisibility(inputId, toggleBtnId);
 }
 
 // Global functions for password visibility toggling
 function toggleLoginPassword() {
-  console.log("Password visibility toggled for login");
-  togglePasswordVisibility('password', 'togglePassword');
+    console.log("Password visibility toggled for login");
+    togglePasswordVisibility('password', 'togglePassword');
 }
 
 function toggleRegisterPassword() {
-  console.log("Password visibility toggled for registration");
-  togglePasswordVisibility('registerPassword', 'toggleRegisterPassword');
+    console.log("Password visibility toggled for registration");
+    togglePasswordVisibility('registerPassword', 'toggleRegisterPassword');
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net/npm/; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; font-src 'self' data:; img-src 'self' data: https://via.placeholder.com https://cdn.pixabay.com; connect-src 'self' http://localhost:8000 https://api.example.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net/npm/; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; font-src 'self' data:; img-src 'self' data: blob: https://via.placeholder.com https://cdn.pixabay.com; connect-src 'self' http://localhost:8000 https://api.example.com;">
     <title>Voting - Decentralized Blockchain Voting</title>
     
     <!-- EMERGENCY AUTHENTICATION FIX -->
@@ -208,6 +208,7 @@
         .icon-plug::before { content: "🔌"; }
         .icon-flag-checkered::before { content: "🏁"; }
         .icon-wallet::before { content: "🦊"; }
+        .icon-upload::before { content: "📤"; }
         .icon-external-link-alt::before { content: "🔗"; }
         .icon-users-slash::before { content: "👥❌"; }
         .icon-circle::before { content: "⚪"; }
@@ -220,14 +221,14 @@
         
         /* Blockchain background */
         .blockchain-background {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100%" height="100%" fill="none"/><path d="M20,50 L35,35 L65,35 L80,50 L65,65 L35,65 Z" stroke="rgba(59, 130, 246, 0.1)" stroke-width="2" fill="none"/><circle cx="35" cy="35" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="65" cy="35" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="80" cy="50" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="65" cy="65" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="35" cy="65" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="20" cy="50" r="3" fill="rgba(59, 130, 246, 0.1)"/></svg>');
+            background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100%25" height="100%25" fill="none"/%3E%3Cpath d="M20,50 L35,35 L65,35 L80,50 L65,65 L35,65 Z" stroke="rgba(59, 130, 246, 0.1)" stroke-width="2" fill="none"/%3E%3Ccircle cx="35" cy="35" r="3" fill="rgba(59, 130, 246, 0.1)"/%3E%3Ccircle cx="65" cy="35" r="3" fill="rgba(59, 130, 246, 0.1)"/%3E%3Ccircle cx="80" cy="50" r="3" fill="rgba(59, 130, 246, 0.1)"/%3E%3Ccircle cx="65" cy="65" r="3" fill="rgba(59, 130, 246, 0.1)"/%3E%3Ccircle cx="35" cy="65" r="3" fill="rgba(59, 130, 246, 0.1)"/%3E%3Ccircle cx="20" cy="50" r="3" fill="rgba(59, 130, 246, 0.1)"/%3E%3C/svg%3E');
             background-repeat: repeat;
             background-size: 100px 100px;
         }
         
         /* Dark mode blockchain background */
         .dark .blockchain-background {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100%" height="100%" fill="none"/><path d="M20,50 L35,35 L65,35 L80,50 L65,65 L35,65 Z" stroke="rgba(59, 130, 246, 0.05)" stroke-width="2" fill="none"/><circle cx="35" cy="35" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="65" cy="35" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="80" cy="50" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="65" cy="65" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="35" cy="65" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="20" cy="50" r="3" fill="rgba(59, 130, 246, 0.05)"/></svg>');
+            background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100%25" height="100%25" fill="none"/%3E%3Cpath d="M20,50 L35,35 L65,35 L80,50 L65,65 L35,65 Z" stroke="rgba(59, 130, 246, 0.05)" stroke-width="2" fill="none"/%3E%3Ccircle cx="35" cy="35" r="3" fill="rgba(59, 130, 246, 0.05)"/%3E%3Ccircle cx="65" cy="35" r="3" fill="rgba(59, 130, 246, 0.05)"/%3E%3Ccircle cx="80" cy="50" r="3" fill="rgba(59, 130, 246, 0.05)"/%3E%3Ccircle cx="65" cy="65" r="3" fill="rgba(59, 130, 246, 0.05)"/%3E%3Ccircle cx="35" cy="65" r="3" fill="rgba(59, 130, 246, 0.05)"/%3E%3Ccircle cx="20" cy="50" r="3" fill="rgba(59, 130, 246, 0.05)"/%3E%3C/svg%3E');
         }
         
         /* Loader */
@@ -515,6 +516,26 @@
         </button>
         <h3 class="text-xl text-white mb-4">Debug Console</h3>
         <div id="debugContent"></div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div id="imageViewerModal" class="fixed inset-0 bg-black/90 z-50 p-4 overflow-auto hidden">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-4">
+                <div class="flex justify-between items-center">
+                    <h3 id="imageViewerTitle" class="text-lg font-semibold"></h3>
+                    <button id="closeImageViewer" class="text-gray-500 hover:text-gray-700">
+                        <span class="icon-times"></span>
+                    </button>
+                </div>
+                <div class="mt-4">
+                    <img id="imageViewerContent" src="" alt="" style="max-width: 100%; max-height: 300px;">
+                </div>
+                <div id="imageViewerControls" class="mt-4">
+                    <!-- Add any additional controls you want to show in the modal -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Ethers.js for blockchain interaction -->
@@ -1266,9 +1287,26 @@
                     const party = candidate.party;
                     const voteCount = parseInt(candidate.voteCount?.toString() || candidate.voteCount || 0);
                     
-                    // Create a default image URL using data URI instead of external service
-                    const imageUrl = candidate.imageUrl || 
-                        `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" fill="%23f0f0f0"/><text x="50%" y="50%" font-family="Arial" font-size="24" text-anchor="middle" dominant-baseline="middle" fill="%23333">${name}</text></svg>`;
+                    // Determine image source - use candidate image URL or generate SVG
+                    let imageUrl = '';
+                    
+                    // First check for locally stored photo
+                    const storedImageUrl = getStoredCandidatePhoto(id);
+                    if (storedImageUrl) {
+                        imageUrl = storedImageUrl;
+                        console.log(`Using stored image for ${name}`);
+                    }
+                    // Then try candidate's provided URL
+                    else if (candidate.imageUrl && candidate.imageUrl.trim() !== '') {
+                        // Use provided image URL
+                        imageUrl = candidate.imageUrl;
+                        console.log(`Using provided image URL for ${name}: ${imageUrl}`);
+                    } else {
+                        // Generate SVG with consistent colors for this candidate
+                        imageUrl = window.createCandidateSvg ? window.createCandidateSvg(name) : 
+                            `data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"%3E%3Crect width="300" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%" y="50%" font-family="Arial" font-size="24" text-anchor="middle" dominant-baseline="middle" fill="%23333"%3E${encodeURIComponent(name)}%3C/text%3E%3C/svg%3E`;
+                        console.log(`Generated SVG image for ${name}`);
+                    }
                     
                     // Create candidate card
                     const candidateCard = document.createElement("div");
@@ -1278,7 +1316,15 @@
                     
                     candidateCard.innerHTML = `
                         <div class="relative pb-48 overflow-hidden">
-                            <img class="absolute inset-0 h-full w-full object-cover" src="${imageUrl}" alt="${name}">
+                            <img class="absolute inset-0 h-full w-full object-cover cursor-pointer" 
+                                src="${imageUrl}" 
+                                alt="${name}"
+                                onclick="viewCandidateImage('${id}', '${name}', this.src)"
+                                onerror="
+                                    console.error('Failed to load image:', this.src); 
+                                    this.onerror=null; 
+                                    this.src = window.createCandidateSvg ? window.createCandidateSvg(this.alt) : 
+                                        'data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'300\\' height=\\'300\\' viewBox=\\'0 0 300 300\\'%3E%3Crect width=\\'100%25\\' height=\\'100%25\\' fill=\\'%23f0f0f0\\'/%3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' font-family=\\'Arial\\' font-size=\\'24\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\' fill=\\'%23333\\'%3E${encodeURIComponent(name)}%3C/text%3E%3C/svg%3E';">
                         </div>
                         <div class="p-4">
                             <div class="flex justify-between items-start">
@@ -1299,6 +1345,15 @@
                                     <label for="candidate-${id}" class="w-full py-2 px-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer font-medium text-gray-700 dark:text-gray-300 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors">
                                         Select Candidate
                                     </label>
+                                </div>
+                                
+                                <!-- Admin: Photo Upload Button (only visible for admins) -->
+                                <div id="admin-controls-${id}" class="mt-2 admin-controls" style="display: none;">
+                                    <button class="w-full py-1.5 px-2 text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600 transition-colors flex items-center justify-center" 
+                                        onclick="openImageUploadDialog('${id}', '${name}')">
+                                        <span class="icon-upload mr-1"></span>
+                                        Update Photo
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1697,6 +1752,7 @@
                 }
             }
             
+            // Load candidates function
             async function loadCandidates() {
                 debugLog("Loading candidates...");
                 try {
@@ -1742,6 +1798,81 @@
                         loadCandidates();
                     });
                 }
+            }
+            
+            // Function to generate a consistent color hash from a string
+            function stringToColor(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                
+                // Generate a hue in the range 0-360
+                const hue = Math.abs(hash) % 360;
+                
+                // Use fixed saturation and lightness for better readability
+                return {
+                    background: `hsl(${hue}, 70%, 85%)`,
+                    text: `hsl(${hue}, 70%, 30%)`
+                };
+            }
+            
+            // Helper function to get candidate image with multiple path attempts
+            function getCandidateImageUrl(imageName, candidateName) {
+                // Attempt different path variations to handle various serving configurations
+                const pathVariations = [
+                    `./assets/images/${imageName}`,
+                    `/assets/images/${imageName}`,
+                    `/src/assets/images/${imageName}`,
+                    `../assets/images/${imageName}`,
+                    `../../assets/images/${imageName}`,
+                    `/APP/src/assets/images/${imageName}`,
+                    `https://raw.githubusercontent.com/yourusername/APP/main/src/assets/images/${imageName}`
+                ];
+                
+                // Create an image element to test which path works
+                const img = new Image();
+                img.style.display = 'none';
+                document.body.appendChild(img);
+                
+                // Log the test
+                console.log(`Testing image paths for candidate ${candidateName}:`, pathVariations);
+                
+                // For immediate return, use the first path, but set up tests for future loads
+                pathVariations.forEach(path => {
+                    const testImg = new Image();
+                    testImg.onload = () => {
+                        console.log(`SUCCESS: Image path worked: ${path} for ${candidateName}`);
+                        window.workingImagePaths = window.workingImagePaths || {};
+                        window.workingImagePaths[imageName] = path;
+                    };
+                    testImg.onerror = () => {
+                        console.log(`FAILED: Image path failed: ${path} for ${candidateName}`);
+                    };
+                    testImg.src = path;
+                });
+                
+                // Remove test image
+                document.body.removeChild(img);
+                
+                // If we've previously found a working path for this image, use it
+                if (window.workingImagePaths && window.workingImagePaths[imageName]) {
+                    return window.workingImagePaths[imageName];
+                }
+                
+                // Generate consistent colors for this candidate
+                const colors = stringToColor(candidateName);
+                
+                // Since we now know these are actually SVGs with jpg extension, create an SVG data URI
+                // that can be used as a direct fallback (more reliable than path-based references)
+                // Note: This matches the format of our existing files
+                const fallbackSvg = `data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Crect width='300' height='300' fill='hsl(0, 70%25, 80%25)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='24' text-anchor='middle' dominant-baseline='middle' fill='hsl(0, 70%25, 30%25)'%3E${candidateName}%3C/text%3E%3C/svg%3E`;
+                
+                // Store this as a working path so we don't try failing paths again
+                window.workingImagePaths = window.workingImagePaths || {};
+                window.workingImagePaths[imageName] = fallbackSvg;
+                
+                return fallbackSvg;
             }
 
             // Theme toggle functionality
@@ -1838,6 +1969,21 @@
                 debugLog("Application initialization error:", error);
                 showFeedback("Failed to initialize application: " + error.message, "Error", true);
             }
+
+            // For candidate image colors - using a simple hash to create consistent colors
+            window.generateCandidateColor = function(name) {
+                let hash = 0;
+                for (let i = 0; i < name.length; i++) {
+                    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                const hue = Math.abs(hash) % 360;
+                return {
+                    background: `hsl(${hue}, 70%, 85%)`,
+                    text: `hsl(${hue}, 70%, 30%)`
+                };
+            };
+            
+            // Configuration
         });
     </script>
     <script>
@@ -2099,5 +2245,445 @@
         // Call cleanup when needed
         window.addEventListener('unload', cleanupParticles);
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Debug image loading issues
+            function debugImageLoading() {
+                console.log("Checking for image loading issues...");
+                const images = document.querySelectorAll('img');
+                console.log(`Found ${images.length} images on the page`);
+                
+                images.forEach((img, index) => {
+                    // Log image details
+                    console.log(`Image #${index + 1}:`, {
+                        src: img.src,
+                        complete: img.complete,
+                        naturalWidth: img.naturalWidth,
+                        naturalHeight: img.naturalHeight
+                    });
+                    
+                    // Add event listeners for load and error events
+                    img.addEventListener('load', () => {
+                        console.log(`Image #${index + 1} loaded successfully:`, img.src);
+                    });
+                    
+                    img.addEventListener('error', () => {
+                        console.error(`Image #${index + 1} failed to load:`, img.src);
+                    });
+                });
+                
+                // Debug SVG background images
+                const elementsWithBackgroundImages = document.querySelectorAll('[class*="blockchain-background"]');
+                console.log(`Found ${elementsWithBackgroundImages.length} elements with blockchain background`);
+                
+                elementsWithBackgroundImages.forEach((el, index) => {
+                    const computedStyle = window.getComputedStyle(el);
+                    const bgImage = computedStyle.backgroundImage;
+                    console.log(`Background image #${index + 1}:`, bgImage);
+                });
+            }
+            
+            // Run image debugging after a short delay to allow images to start loading
+            setTimeout(debugImageLoading, 1000);
+            
+            // Initialize theme toggle
+            initializeThemeToggle();
+            
+            // Initialize authentication
+            checkAuthentication();
+            
+            // Update network status
+            checkNetworkStatus();
+        });
+    </script>
+    <script>
+        // Helper function to upload/manage candidate photos (for future admin use)
+        async function uploadCandidatePhoto(candidateId, candidateName, fileInput) {
+            // This would typically connect to a server API endpoint 
+            // For now, it's a stub function for future implementation
+            console.log(`Preparing to upload photo for candidate #${candidateId} (${candidateName})`);
+            
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                console.error('No file selected for upload');
+                return { success: false, error: 'No file selected' };
+            }
+            
+            const file = fileInput.files[0];
+            
+            // Check file type
+            if (!file.type.match('image.*')) {
+                console.error('Selected file is not an image');
+                return { success: false, error: 'File must be an image' };
+            }
+            
+            // Check file size (limit to 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                console.error('File is too large');
+                return { success: false, error: 'File must be less than 2MB' };
+            }
+            
+            try {
+                // Process image (resize and optimize)
+                const processedImageUrl = await processImage(file, 300, 300);
+                
+                // Store in localStorage for persistence across page reloads
+                const storedImages = JSON.parse(localStorage.getItem('candidateImages') || '{}');
+                storedImages[candidateId] = {
+                    name: candidateName,
+                    url: processedImageUrl,
+                    timestamp: Date.now(),
+                    originalFilename: file.name
+                };
+                localStorage.setItem('candidateImages', JSON.stringify(storedImages));
+                
+                // Also save to window.candidateImages in case localStorage fails
+                window.candidateImages = window.candidateImages || {};
+                window.candidateImages[candidateId] = processedImageUrl;
+                
+                console.log(`Photo for candidate #${candidateId} processed and stored successfully`);
+                return { success: true, url: processedImageUrl };
+            } catch (error) {
+                console.error('Error processing image:', error);
+                return { success: false, error: 'Failed to process image' };
+            }
+        }
+        
+        // Process and resize image to maintain consistent sizing
+        function processImage(file, targetWidth, targetHeight) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    
+                    img.onload = function() {
+                        // Create canvas for resizing
+                        const canvas = document.createElement('canvas');
+                        canvas.width = targetWidth;
+                        canvas.height = targetHeight;
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Determine how to resize (crop or scale)
+                        let sourceX = 0, sourceY = 0, sourceWidth = img.width, sourceHeight = img.height;
+                        
+                        // Center crop if needed
+                        if (sourceWidth / sourceHeight > targetWidth / targetHeight) {
+                            // Image is wider than needed - crop width
+                            sourceWidth = sourceHeight * (targetWidth / targetHeight);
+                            sourceX = (img.width - sourceWidth) / 2;
+                        } else {
+                            // Image is taller than needed - crop height
+                            sourceHeight = sourceWidth * (targetHeight / targetWidth);
+                            sourceY = (img.height - sourceHeight) / 2;
+                        }
+                        
+                        // Draw image on canvas with proper dimensions
+                        ctx.drawImage(
+                            img, 
+                            sourceX, sourceY, sourceWidth, sourceHeight,
+                            0, 0, targetWidth, targetHeight
+                        );
+                        
+                        // Convert to data URL (with quality parameter for JPEGs)
+                        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+                        const quality = mimeType === 'image/jpeg' ? 0.85 : 1; // 85% quality for JPEG
+                        
+                        try {
+                            const dataUrl = canvas.toDataURL(mimeType, quality);
+                            resolve(dataUrl);
+                        } catch (err) {
+                            reject(new Error('Failed to convert image to data URL'));
+                        }
+                    };
+                    
+                    img.onerror = function() {
+                        reject(new Error('Failed to load image'));
+                    };
+                    
+                    img.src = e.target.result;
+                };
+                
+                reader.onerror = function() {
+                    reject(new Error('Failed to read file'));
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // Function to get a stored candidate photo (from localStorage, would be from server in production)
+        function getStoredCandidatePhoto(candidateId) {
+            // First check memory cache
+            if (window.candidateImages && window.candidateImages[candidateId]) {
+                return window.candidateImages[candidateId];
+            }
+            
+            // Then check localStorage
+            try {
+                const storedImages = JSON.parse(localStorage.getItem('candidateImages') || '{}');
+                return storedImages[candidateId]?.url || null;
+            } catch (e) {
+                console.error('Error retrieving stored image:', e);
+                return null;
+            }
+        }
+    </script>
+    <!-- SVG Utilities for Candidate Images -->
+    <script>
+        // SVG utility functions for candidate images
+        (function() {
+            // Generate consistent colors for a candidate name
+            window.generateCandidateColor = function(name) {
+                let hash = 0;
+                for (let i = 0; i < name.length; i++) {
+                    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                const hue = Math.abs(hash) % 360;
+                return {
+                    background: `hsl(${hue}, 70%, 85%)`,
+                    text: `hsl(${hue}, 70%, 30%)`
+                };
+            };
+            
+            // Create SVG data URI for a candidate
+            window.createCandidateSvg = function(name) {
+                const colors = window.generateCandidateColor(name);
+                const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+                    <rect width="300" height="300" fill="${colors.background}"/>
+                    <text x="50%" y="50%" font-family="Arial" font-size="24" text-anchor="middle" dominant-baseline="middle" fill="${colors.text}">${name}</text>
+                </svg>`;
+                return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgContent)}`;
+            };
+        })();
+    </script>
+    
+    <!-- Candidate Image Management -->
+    <script>
+        // Global file input for candidate photos
+        let globalFileInput = null;
+        let currentUploadCandidate = null;
+        
+        // Create reusable file input element
+        function createFileInput() {
+            if (!globalFileInput) {
+                globalFileInput = document.createElement('input');
+                globalFileInput.type = 'file';
+                globalFileInput.accept = 'image/*';
+                globalFileInput.style.display = 'none';
+                globalFileInput.setAttribute('aria-hidden', 'true');
+                document.body.appendChild(globalFileInput);
+                
+                // Handle file selection
+                globalFileInput.addEventListener('change', handleFileSelection);
+            }
+            return globalFileInput;
+        }
+        
+        // View candidate image in modal
+        function viewCandidateImage(candidateId, candidateName, imageSrc) {
+            const modal = document.getElementById('imageViewerModal');
+            const title = document.getElementById('imageViewerTitle');
+            const img = document.getElementById('imageViewerContent');
+            const controls = document.getElementById('imageViewerControls');
+            
+            if (!modal || !title || !img) {
+                console.error('Image viewer elements not found');
+                return;
+            }
+            
+            // Set content
+            title.textContent = `${candidateName}`;
+            img.src = imageSrc;
+            img.alt = candidateName;
+            
+            // Show admin controls if user is admin
+            const userRole = localStorage.getItem('user_role');
+            const isAdmin = userRole === 'admin' || userRole === 'administrator';
+            
+            if (isAdmin) {
+                controls.innerHTML = `
+                    <button onclick="openImageUploadDialog('${candidateId}', '${candidateName}')" 
+                        class="py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-md flex items-center">
+                        <span class="icon-upload mr-2"></span>Update Photo
+                    </button>
+                `;
+            } else {
+                controls.innerHTML = '';
+            }
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            
+            // Add close handler
+            document.getElementById('closeImageViewer').onclick = function() {
+                modal.classList.add('hidden');
+            };
+            
+            // Close on escape key
+            document.addEventListener('keydown', function escHandler(e) {
+                if (e.key === 'Escape') {
+                    modal.classList.add('hidden');
+                    document.removeEventListener('keydown', escHandler);
+                }
+            });
+            
+            // Close on click outside content
+            modal.addEventListener('click', function modalClick(e) {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    modal.removeEventListener('click', modalClick);
+                }
+            });
+        }
+        
+        // Open file dialog for selecting candidate image
+        function openImageUploadDialog(candidateId, candidateName) {
+            // Store the current candidate being edited
+            currentUploadCandidate = {
+                id: candidateId,
+                name: candidateName
+            };
+            
+            // Get/create file input and trigger click
+            const fileInput = createFileInput();
+            fileInput.click();
+        }
+        
+        // Handle selected file
+        async function handleFileSelection() {
+            if (!globalFileInput.files || globalFileInput.files.length === 0 || !currentUploadCandidate) {
+                console.log('No file selected or no candidate specified');
+                return;
+            }
+            
+            const file = globalFileInput.files[0];
+            
+            // Show loading state
+            const uploadButton = document.querySelector(`#admin-controls-${currentUploadCandidate.id} button`);
+            const originalButtonText = uploadButton.innerHTML;
+            uploadButton.innerHTML = '<span class="loader"></span><span>Uploading...</span>';
+            uploadButton.disabled = true;
+            
+            try {
+                // Upload the photo
+                const result = await uploadCandidatePhoto(
+                    currentUploadCandidate.id, 
+                    currentUploadCandidate.name, 
+                    globalFileInput
+                );
+                
+                if (result.success) {
+                    console.log('Photo uploaded successfully:', result.url);
+                    
+                    // Update the image in the UI
+                    const candidateImage = document.querySelector(`#candidate-card-${currentUploadCandidate.id} img`);
+                    if (candidateImage) {
+                        candidateImage.src = result.url;
+                    }
+                    
+                    // Show success notification
+                    showUploadNotification(
+                        `Photo for ${currentUploadCandidate.name} updated successfully!`, 
+                        'success'
+                    );
+                } else {
+                    console.error('Photo upload failed:', result.error);
+                    showUploadNotification(
+                        `Failed to update photo: ${result.error}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                console.error('Error during upload:', error);
+                showUploadNotification(
+                    'An unexpected error occurred during upload', 
+                    'error'
+                );
+            } finally {
+                // Reset UI state
+                uploadButton.innerHTML = originalButtonText;
+                uploadButton.disabled = false;
+                
+                // Reset file input
+                globalFileInput.value = '';
+            }
+        }
+        
+        // Show notification for upload result
+        function showUploadNotification(message, type = 'success') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg ${
+                type === 'success' 
+                    ? 'bg-green-100 border-green-500 text-green-800' 
+                    : 'bg-red-100 border-red-500 text-red-800'
+            } border-l-4 transform transition-transform duration-300 z-50`;
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <span class="${type === 'success' ? 'icon-check-circle' : 'icon-exclamation-circle'} mr-2"></span>
+                    <span>${message}</span>
+                </div>
+                <button class="absolute top-1 right-1 text-gray-500 hover:text-gray-700" onclick="this.parentNode.remove()">
+                    <span class="icon-times"></span>
+                </button>
+            `;
+            
+            // Add to document
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-y-full', 'opacity-0');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+        
+        // Check if user has admin rights and show admin controls
+        function checkAdminAccess() {
+            const userRole = localStorage.getItem('user_role');
+            const isAdmin = userRole === 'admin' || userRole === 'administrator';
+            
+            // Show/hide admin controls based on role
+            document.querySelectorAll('.admin-controls').forEach(element => {
+                element.style.display = isAdmin ? 'block' : 'none';
+            });
+            
+            return isAdmin;
+        }
+        
+        // Initialize admin features when document loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(checkAdminAccess, 1000); // Delay to ensure candidate cards are loaded
+        });
+    </script>
+    <!-- Candidate Image Management -->
+    <script>
+        // Global file input for candidate photos
+        let globalFileInput = null;
+        let currentUploadCandidate = null;
+        
+        // Debug function to set admin mode - remove in production
+        function setAdminMode() {
+            localStorage.setItem('user_role', 'admin');
+            checkAdminAccess();
+            showUploadNotification('Admin mode enabled!', 'success');
+            return "Admin mode enabled. Upload buttons should now be visible.";
+        }
+    </script>
+    
+    <!-- Admin Helper (for testing only - remove in production) -->
+    <script>
+        // Enable admin mode for testing the upload features
+        function enableAdminMode() {
+            localStorage.setItem('user_role', 'admin');
+            
+            // Show admin controls
+            document.querySelectorAll('.admin-controls').forEach(element => {
+                element.style.display = 'block';
+            });
+            
+            // Show notification
+            const notification = document.createElement('div');
 </body>
 </html>

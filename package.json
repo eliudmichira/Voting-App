@@ -69,7 +69,8 @@
     "mobile": "npm run update-ip && npm run expo-start-lan",
     "mobile-tunnel": "npm run expo-start-tunnel",
     "android": "npm run update-ip && npm run expo-android",
-    "ios": "npm run update-ip && npm run expo-ios"
+    "ios": "npm run update-ip && npm run expo-ios",
+    "dev": "node scripts/dev-start.js"
   },
   "eslintConfig": {
     "extends": [
