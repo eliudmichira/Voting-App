@@ -1,0 +1,14 @@
+module.exports = function(api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: [
+      // Support for class properties
+      ['@babel/plugin-proposal-class-properties', { loose: true }],
+      // Support for async/await
+      '@babel/plugin-transform-runtime',
+      // Support for WalletConnect
+      'react-native-reanimated/plugin',
+    ],
+  };
+}; 

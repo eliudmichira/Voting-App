@@ -1,0 +1,44 @@
+{
+  "users": [
+    {
+      "id": "162c0bac-60c2-467c-aea2-848bff150f1b",
+      "nationalId": "40034119",
+      "passwordHash": "49dab764c4bc965361a7f1392b0b1c3234f26581b059ce4dd8f2b5085f09e55bdf0386bd3fedd9fe9564567d0b88cc8e6138b13e5745b52f0b9baf8217e32afd",
+      "passwordSalt": "fb279b659cfaf741220a046edab84cb4",
+      "walletAddress": "0x577a71aeae2c21d56b0c99d1e7c568fcc2391587",
+      "created": "2025-03-23T06:50:10.778Z",
+      "lastLogin": "2025-04-25T12:56:08.181Z",
+      "role": "admin"
+    },
+    {
+      "id": "efd92bea-ad86-4209-8ceb-d3242614fb97",
+      "nationalId": "344119",
+      "passwordHash": "fe6d45424b111be1c6b5b3c7e6c44f0bc8a242a632140c0e4252e7789c21089c96c8038f80197b484d38f1f067cc2ee80aa839f75fb4a1c54c9eeed8fe242950",
+      "passwordSalt": "c9d72351ffb4df3635573958ab54431e",
+      "walletAddress": "0x0b26432e4c0a4db3bcea7feff8e11f66468731f5",
+      "created": "2025-03-23T06:53:40.946Z",
+      "lastLogin": "2025-04-01T08:43:14.567Z",
+      "role": "admin"
+    },
+    {
+      "id": "f7e0de77-2210-4fe3-b2b1-478ba171c984",
+      "nationalId": "20034119",
+      "passwordHash": "f12f5a1b2e2b53ace6c10d389f89f3aee24ae5aba041c0b96d56dc15dc7a5051c0ec227a6cc0d4ad2dd2c60099e4ffc35ee5fc30d8987ba1a6223d4e8b7ec077",
+      "passwordSalt": "d7891499edb3d18f1d88f6f9c2e0a8c4",
+      "walletAddress": "0x8305528547df8924615ef072cc2b05d9417d494b",
+      "created": "2025-03-27T11:15:41.994Z",
+      "lastLogin": "2025-04-25T12:37:41.131Z",
+      "role": "voter"
+    },
+    {
+      "id": "9b5ca020-8266-454d-9eb8-bd14640f8266",
+      "nationalId": "41411738",
+      "passwordHash": "a3af5ad45eab0425608581d40308688886b99720354a3fcf2657782c109b4f012d82aa650cbba462381ecfad03fb52594587ebb0765105b7d1cae5026298e3d6",
+      "passwordSalt": "d8ed39c316446a3854a44831d02032df",
+      "walletAddress": "0x16167d10b59ae707bb7a8db7072b878eaca89672",
+      "created": "2025-03-31T12:41:30.663Z",
+      "lastLogin": "2025-03-31T12:41:53.628Z",
+      "role": "voter"
+    }
+  ]
+}
